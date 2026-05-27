@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamburgada da Cruz — Artesanal & Sagrado</title>
+    <meta name="description"
+        content="Hambúrgueres artesanais com alma e tradição. Nascida da fé e do amor familiar, a Hamburgada da Cruz é uma experiência gastronômica única.">
+    <link rel="icon" type="image/jpeg" href="IMGS/ICON.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-cross">✝</div>
+            <p class="loader-text">Hamburgada<span> da Cruz</span></p>
+            <div class="loader-bar">
+                <div class="loader-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cursor glow follower -->
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <!-- WhatsApp Floating Button — Minimalista -->
+    <a href="https://wa.me/5511999999999" class="whatsapp-fab" id="whatsappFab" target="_blank"
+        aria-label="Fazer pedido pelo WhatsApp">
+        <div class="fab-pulse"></div>
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Header / Navbar -->
+    <header class="site-header" id="header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="#home">
+                    <span class="logo-cross">✝</span>
+                    Hamburgada<span class="logo-dot">.</span>da Cruz
+                </a>
+            </div>
+            <nav class="primary-nav" id="primaryNav" aria-label="Navegação principal">
+                <ul class="nav-list">
+                    <li><a href="#home" class="nav-link active">Início</a></li>
+                    <li><a href="#menu" class="nav-link">Cardápio</a></li>
+                    <li><a href="#about" class="nav-link">Nossa História</a></li>
+                    <li><a href="#contact" class="nav-link">Contato</a></li>
+                </ul>
+            </nav>
+            <a href="#menu" class="nav-cta-btn">
+                <span>Ver Cardápio</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Abrir menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="hero-ambient">
+            <div class="ambient-orb orb-1"></div>
+            <div class="ambient-orb orb-2"></div>
+            <div class="ambient-orb orb-3"></div>
+        </div>
+        <div class="hero-grain"></div>
+        <div class="container hero-container">
+            <div class="hero-content">
+                <div class="hero-badge" data-reveal>
+                    <span class="badge-dot"></span>
+                    Artesanal & Sagrado
+                </div>
+                <h1 class="hero-title" data-reveal>
+                    O sabor que<br>
+                    <span class="gold-text">alimenta a alma</span>
+                </h1>
+                <p class="hero-subtitle" data-reveal>
+                    Nascida da fé e do amor familiar, cada mordida é uma celebração.
+                    Ingredientes artesanais. Preparo com devoção. Sabor inesquecível.
+                </p>
+                <div class="hero-buttons" data-reveal>
+                    <a href="#menu" class="btn btn-gold">
+                        <span>Ver Cardápio</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="https://wa.me/5583999999999" class="btn btn-ghost" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Pedir Agora</span>
+                    </a>
+                </div>
+                <div class="hero-proof" data-reveal>
+                    <div class="proof-item">
+                        <strong>10k+</strong>
+                        <span>Hambúrgueres</span>
+                    </div>
+                    <div class="proof-divider"></div>
+                    <div class="proof-item">
+                        <strong>4.9 ★</strong>
+                        <span>Avaliação</span>
+                    </div>
+                    <div class="proof-divider"></div>
+                    <div class="proof-item">
+                        <strong>5+ anos</strong>
+                        <span>Tradição</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual" data-reveal>
+                <div class="hero-divine-glow"></div>
+                <div class="hero-img-wrapper float-animation">
+                    <div class="img-divine-light"></div>
+                    <img src="IMGS/Hamburguer sendo mostrado.jpg" alt="Hambúrguer artesanal da Hamburgada da Cruz"
+                        class="hero-img" loading="eager">
+                    <div class="img-badge img-badge-top">
+                        <i class="fas fa-fire"></i>
+                        <span>Na Brasa</span>
+                    </div>
+                    <div class="img-badge img-badge-bottom">
+                        <span class="badge-price">a partir de R$18</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-scroll-cue">
+            <span>Descubra</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Stats Ribbon -->
+    <section class="stats-ribbon">
+        <div class="container">
+            <div class="ribbon-grid">
+                <div class="ribbon-item" data-reveal>
+                    <div class="ribbon-icon"><i class="fas fa-hamburger"></i></div>
+                    <div class="ribbon-data">
+                        <span class="ribbon-number" data-count="10000">0</span>
+                        <span class="ribbon-label">Hambúrgueres servidos</span>
+                    </div>
+                </div>
+                <div class="ribbon-item" data-reveal>
+                    <div class="ribbon-icon"><i class="fas fa-cross"></i></div>
+                    <div class="ribbon-data">
+                        <span class="ribbon-number" data-count="5">0</span>
+                        <span class="ribbon-label">Anos de fé e sabor</span>
+                    </div>
+                </div>
+                <div class="ribbon-item" data-reveal>
+                    <div class="ribbon-icon"><i class="fas fa-heart"></i></div>
+                    <div class="ribbon-data">
+                        <span class="ribbon-number" data-count="98">0</span>
+                        <span class="ribbon-label">Clientes satisfeitos</span>
+                    </div>
+                </div>
+                <div class="ribbon-item" data-reveal>
+                    <div class="ribbon-icon"><i class="fas fa-users"></i></div>
+                    <div class="ribbon-data">
+                        <span class="ribbon-number">Família</span>
+                        <span class="ribbon-label">Comunidade unida</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section — Bento Grid -->
+    <section id="menu" class="menu-section">
+        <div class="container">
+            <div class="section-header" data-reveal>
+                <span class="section-eyebrow">✝ Nosso Cardápio</span>
+                <h2 class="section-title">Sabores<br><span class="gold-text">Consagrados</span></h2>
+                <p class="section-desc">Cada hambúrguer é preparado como uma oferenda — com os melhores ingredientes e
+                    todo o carinho da família.</p>
+            </div>
+
+            <div class="menu-filters" data-reveal>
+                <button class="filter-pill active" data-filter="all">
+                    <i class="fas fa-th-large"></i>
+                    Todos
+                </button>
+                <button class="filter-pill" data-filter="individual">
+                    <i class="fas fa-hamburger"></i>
+                    Individuais
+                </button>
+                <button class="filter-pill" data-filter="combo">
+                    <i class="fas fa-box-open"></i>
+                    Combos
+                </button>
+            </div>
+
+            <div class="bento-grid" id="menuGrid"></div>
+
+            <div class="menu-cta" data-reveal>
+                <a href="https://wa.me/5583999999999" class="btn btn-gold btn-lg" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Fazer Pedido pelo WhatsApp</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- About / Nossa História Section -->
+    <section id="about" class="about-section">
+        <div class="about-ambient">
+            <div class="ambient-orb orb-about-1"></div>
+            <div class="ambient-orb orb-about-2"></div>
+        </div>
+        <div class="container">
+            <div class="section-header" data-reveal>
+                <span class="section-eyebrow">✝ Nossa História</span>
+                <h2 class="section-title">Paixão da Família<br><span class="gold-text">Caminho da Cruz</span></h2>
+            </div>
+
+            <div class="about-story" data-reveal>
+                <div class="story-gallery">
+                    <div class="gallery-frame gallery-frame-main">
+                        <img src="IMGS/familia.jpg" alt="Família da Hamburgada da Cruz reunida" loading="lazy">
+                    </div>
+                    <div class="gallery-frame gallery-frame-secondary">
+                        <img src="IMGS/familia2.jpg" alt="Comunidade da Hamburgada da Cruz" loading="lazy">
+                    </div>
+                    <div class="gallery-badge">
+                        <i class="fas fa-star"></i>
+                        <div>
+                            <strong>4.9/5</strong>
+                            <span>1.200+ avaliações</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-content">
+                    <p class="story-lead">
+                        A Hamburgada da Cruz nasceu com uma ideia simples: auxiliar nas despesas da casa através da fé,
+                        do amor e de muitos hambúrgueres deliciosos.
+                    </p>
+                    <p class="story-text">
+                        A partir disso, nos reunimos todo último domingo do mês para servir à comunidade — vendendo
+                        hambúrgueres artesanais preparados com ingredientes selecionados e receitas secretas da família.
+                        Nossos pães são assados no dia, a carne é escolhida a dedo e cada molho é feito na hora.
+                    </p>
+                    <div class="story-pillars">
+                        <div class="pillar-card">
+                            <div class="pillar-icon"><i class="fas fa-drumstick-bite"></i></div>
+                            <h3>Carne Premium</h3>
+                            <p>Blend exclusivo selecionado</p>
+                        </div>
+                        <div class="pillar-card">
+                            <div class="pillar-icon"><i class="fas fa-leaf"></i></div>
+                            <h3>Ingredientes Frescos</h3>
+                            <p>Do mercado direto pra grelha</p>
+                        </div>
+                        <div class="pillar-card">
+                            <div class="pillar-icon"><i class="fas fa-fire"></i></div>
+                            <h3>Grelha na Hora</h3>
+                            <p>Preparo artesanal com amor</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instagram Section -->
+    <section id="instagram" class="instagram-section">
+        <div class="container">
+            <div class="section-header" data-reveal>
+                <span class="section-eyebrow">✝ Siga @ccaminhodacruz</span>
+                <h2 class="section-title">Nossa Missão &<br><span class="gold-text">Comunidade</span></h2>
+                <p class="section-desc">Acompanhe nossa missão, momentos de comunhão e a preparação de cada hambúrguer
+                    feito com devoção.</p>
+            </div>
+
+            <div class="instagram-grid" data-reveal>
+                <a href="https://www.instagram.com/ccaminhodacruz" target="_blank" class="instagram-item">
+                    <img src="IMGS/Hamburguer sendo mostrado.jpg" alt="Hamburguer Artesanal" class="instagram-img"
+                        loading="lazy">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram instagram-icon"></i>
+                        <span class="instagram-caption">Preparado com amor e devoção. Cada mordida é uma bênção!
+                            🍔</span>
+                        <div class="instagram-meta">
+                            <span><i class="fas fa-heart"></i> 342</span>
+                            <span><i class="fas fa-comment"></i> 28</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/ccaminhodacruz" target="_blank" class="instagram-item">
+                    <img src="IMGS/familia.jpg" alt="Família Caminho da Cruz" class="instagram-img" loading="lazy">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram instagram-icon"></i>
+                        <span class="instagram-caption">Nossa família unida no último domingo do mês para servir você.
+                            ✝</span>
+                        <div class="instagram-meta">
+                            <span><i class="fas fa-heart"></i> 512</span>
+                            <span><i class="fas fa-comment"></i> 43</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/ccaminhodacruz" target="_blank" class="instagram-item">
+                    <img src="IMGS/familia2.jpg" alt="Comunidade Caminho da Cruz" class="instagram-img" loading="lazy">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram instagram-icon"></i>
+                        <span class="instagram-caption">Comunidade reunida em oração e celebração. Trabalho e fé!
+                            🙏</span>
+                        <div class="instagram-meta">
+                            <span><i class="fas fa-heart"></i> 489</span>
+                            <span><i class="fas fa-comment"></i> 37</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/ccaminhodacruz" target="_blank" class="instagram-item">
+                    <img src="IMGS/Hamburguer sendo mostrado.jpg" alt="Hamburguer na Brasa" class="instagram-img"
+                        loading="lazy">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram instagram-icon"></i>
+                        <span class="instagram-caption">O segredo está no carinho e nos ingredientes selecionados.
+                            🔥</span>
+                        <div class="instagram-meta">
+                            <span><i class="fas fa-heart"></i> 276</span>
+                            <span><i class="fas fa-comment"></i> 19</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="instagram-cta" data-reveal>
+                <a href="https://www.instagram.com/ccaminhodacruz" class="btn btn-gold" target="_blank"
+                    id="instagramBtn">
+                    <i class="fab fa-instagram"></i>
+                    <span>Acompanhe nossa missão</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="section-header" data-reveal>
+                <span class="section-eyebrow">✝ Fale Conosco</span>
+                <h2 class="section-title">Entre em<br><span class="gold-text">Contato</span></h2>
+                <p class="section-desc">Dúvidas, elogios ou sugestões? Queremos ouvir você.</p>
+            </div>
+
+            <div class="contact-bento" data-reveal>
+                <div class="contact-info-grid">
+                    <div class="contact-card">
+                        <div class="contact-card-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <h3>Endereço</h3>
+                        <p>Avenida das Nações, 1234 — Jardins</p>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-card-icon"><i class="fas fa-phone"></i></div>
+                        <h3>Telefone</h3>
+                        <p>(11) 99999-9999</p>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-card-icon"><i class="fas fa-clock"></i></div>
+                        <h3>Horário</h3>
+                        <p>Todo último Domingo do mês</p>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-card-icon"><i class="fas fa-envelope"></i></div>
+                        <h3>Email</h3>
+                        <p>contato@hamburgadacruz.com.br</p>
+                    </div>
+                </div>
+
+                <form id="contactForm" class="contact-form" novalidate>
+                    <h3 class="form-headline">Envie uma mensagem</h3>
+                    <div class="form-field">
+                        <input type="text" id="form-name" name="name" placeholder=" " required>
+                        <label for="form-name">Seu nome</label>
+                        <div class="field-line"></div>
+                    </div>
+                    <div class="form-field">
+                        <input type="email" id="form-email" name="email" placeholder=" " required>
+                        <label for="form-email">Seu e-mail</label>
+                        <div class="field-line"></div>
+                    </div>
+                    <div class="form-field">
+                        <input type="tel" id="form-phone" name="phone" placeholder=" ">
+                        <label for="form-phone">Telefone (opcional)</label>
+                        <div class="field-line"></div>
+                    </div>
+                    <div class="form-field">
+                        <textarea id="form-message" name="message" placeholder=" " rows="4" required></textarea>
+                        <label for="form-message">Sua mensagem</label>
+                        <div class="field-line"></div>
+                    </div>
+                    <button type="submit" class="btn btn-gold btn-block">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Enviar Mensagem</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="cta-final">
+        <div class="cta-ambient">
+            <div class="ambient-orb orb-cta-1"></div>
+            <div class="ambient-orb orb-cta-2"></div>
+        </div>
+        <div class="container">
+            <div class="cta-inner" data-reveal>
+                <span class="cta-cross">✝</span>
+                <h2>Pronto para o melhor<br><span class="gold-text">hambúrguer da sua vida?</span></h2>
+                <p>Faça seu pedido pelo WhatsApp e saboreie com fé.</p>
+                <a href="https://wa.me/5583999999999" class="btn btn-gold btn-lg" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Fazer Meu Pedido Agora</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="#home" class="footer-logo">
+                        <span class="logo-cross">✝</span>
+                        Hamburgada<span class="logo-dot">.</span>da Cruz
+                    </a>
+                    <p class="footer-desc">Fé, família e sabor em cada mordida. Hambúrgueres artesanais feitos com
+                        devoção.</p>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/ccaminhodacruz" target="_blank" aria-label="Instagram"><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>Navegação</h4>
+                        <ul>
+                            <li><a href="#home">Início</a></li>
+                            <li><a href="#menu">Cardápio</a></li>
+                            <li><a href="#about">Nossa História</a></li>
+                            <li><a href="#contact">Contato</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Links Úteis</h4>
+                        <ul>
+                            <li><a href="https://wa.me/5583999999999" target="_blank">Faça seu pedido</a></li>
+                            <li><a href="#menu">Cardápio completo</a></li>
+                            <li><a href="#instagram">Acompanhe a Missão</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; <span id="year"></span> Hamburgada da Cruz. Todos os direitos reservados.</p>
+                <div class="footer-legal">
+                    <a href="#">Privacidade</a>
+                    <a href="#">Termos</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

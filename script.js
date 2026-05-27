@@ -50,15 +50,21 @@
     var primaryNav = document.getElementById('primaryNav');
     if (!navToggle || !primaryNav) return;
 
+    function setMenuState(isOpen) {
+        navToggle.classList.toggle('active', isOpen);
+        primaryNav.classList.toggle('active', isOpen);
+        document.body.classList.toggle('nav-open', isOpen);
+        navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        navToggle.setAttribute('aria-label', isOpen ? 'Fechar menu' : 'Abrir menu');
+    }
+
     navToggle.addEventListener('click', function() {
-        navToggle.classList.toggle('active');
-        primaryNav.classList.toggle('active');
+        setMenuState(!primaryNav.classList.contains('active'));
     });
 
     document.querySelectorAll('.nav-link').forEach(function(link) {
         link.addEventListener('click', function() {
-            navToggle.classList.remove('active');
-            primaryNav.classList.remove('active');
+            setMenuState(false);
         });
     });
 
@@ -67,8 +73,19 @@
         if (primaryNav.classList.contains('active') &&
             !primaryNav.contains(e.target) &&
             !navToggle.contains(e.target)) {
-            navToggle.classList.remove('active');
-            primaryNav.classList.remove('active');
+            setMenuState(false);
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && primaryNav.classList.contains('active')) {
+            setMenuState(false);
+        }
+    });
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768 && primaryNav.classList.contains('active')) {
+            setMenuState(false);
         }
     });
 })();
@@ -101,8 +118,13 @@
 // ===== Smooth Scroll =====
 document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
     anchor.addEventListener('click', function(e) {
+        var href = this.getAttribute('href');
+        if (!href || href === '#') {
+            e.preventDefault();
+            return;
+        }
         e.preventDefault();
-        var target = document.querySelector(this.getAttribute('href'));
+        var target = document.querySelector(href);
         if (target) {
             var headerOffset = 80;
             var elementPosition = target.getBoundingClientRect().top;

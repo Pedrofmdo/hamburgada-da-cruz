@@ -61,6 +61,10 @@
                 <span>Ver Cardápio</span>
                 <i class="fas fa-arrow-right"></i>
             </a>
+            <button class="cart-btn" id="cartBtn" type="button" aria-label="Abrir carrinho">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-badge" id="cartBadge" hidden>0</span>
+            </button>
             <button class="nav-toggle" id="navToggle" type="button" aria-label="Abrir menu" aria-controls="primaryNav"
                 aria-expanded="false">
                 <span></span>
@@ -482,6 +486,147 @@
         </div>
     </footer>
 
+    <!-- Cart Drawer + Checkout -->
+    <div class="cart-backdrop" id="cartBackdrop" hidden></div>
+    <aside class="cart-drawer" id="cartDrawer" aria-label="Carrinho de compras" aria-hidden="true">
+        <div class="cart-drawer-head">
+            <h3><span class="logo-cross">✝</span> Seu Pedido</h3>
+            <button class="cart-close" id="cartClose" type="button" aria-label="Fechar carrinho">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Passo 1 — Itens do carrinho -->
+        <div class="cart-step" id="cartStepItems">
+            <div class="cart-empty" id="cartEmpty">
+                <i class="fas fa-shopping-bag"></i>
+                <p>Seu carrinho está vazio.</p>
+                <a href="#menu" class="btn btn-ghost" id="cartEmptyCta"><span>Ver Cardápio</span></a>
+            </div>
+            <div class="cart-items" id="cartItems"></div>
+            <div class="cart-foot" id="cartFoot" hidden>
+                <div class="cart-subtotal">
+                    <span>Subtotal</span>
+                    <strong id="cartSubtotal">R$ 0,00</strong>
+                </div>
+                <p class="cart-note"><i class="fas fa-shield-alt"></i> Pagamento seguro via Mercado Pago (Pix ou cartão).</p>
+                <button class="btn btn-gold btn-block" id="cartToCheckout" type="button">
+                    <span>Continuar</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Passo 2 — Checkout -->
+        <div class="cart-step" id="cartStepCheckout" hidden>
+            <button class="cart-back" id="cartBack" type="button">
+                <i class="fas fa-arrow-left"></i> Voltar ao carrinho
+            </button>
+            <form id="checkoutForm" class="checkout-form" novalidate>
+                <div class="form-field">
+                    <input type="text" id="co-name" name="name" placeholder=" " required>
+                    <label for="co-name">Seu nome *</label>
+                    <div class="field-line"></div>
+                </div>
+                <div class="form-field">
+                    <input type="tel" id="co-phone" name="phone" placeholder=" " inputmode="tel" required>
+                    <label for="co-phone">Telefone / WhatsApp (com DDD) *</label>
+                    <div class="field-line"></div>
+                </div>
+                <div class="form-field">
+                    <input type="email" id="co-email" name="email" placeholder=" " inputmode="email">
+                    <label for="co-email">E-mail (opcional — recibo do pagamento)</label>
+                    <div class="field-line"></div>
+                </div>
+
+                <div class="fulfillment-toggle" role="radiogroup" aria-label="Forma de recebimento">
+                    <label class="fulfillment-opt">
+                        <input type="radio" name="fulfillment" value="pickup" checked>
+                        <span><i class="fas fa-store"></i> Retirar no local</span>
+                    </label>
+                    <label class="fulfillment-opt">
+                        <input type="radio" name="fulfillment" value="delivery">
+                        <span><i class="fas fa-motorcycle"></i> Entrega</span>
+                    </label>
+                </div>
+
+                <div class="delivery-fields" id="deliveryFields" hidden>
+                    <div class="form-field">
+                        <input type="text" id="co-street" name="street" placeholder=" ">
+                        <label for="co-street">Rua / Avenida</label>
+                        <div class="field-line"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <input type="text" id="co-number" name="number" placeholder=" ">
+                            <label for="co-number">Número</label>
+                            <div class="field-line"></div>
+                        </div>
+                        <div class="form-field">
+                            <input type="text" id="co-district" name="district" placeholder=" ">
+                            <label for="co-district">Bairro</label>
+                            <div class="field-line"></div>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <input type="text" id="co-complement" name="complement" placeholder=" ">
+                        <label for="co-complement">Complemento (opcional)</label>
+                        <div class="field-line"></div>
+                    </div>
+                    <div class="form-field">
+                        <input type="text" id="co-reference" name="reference" placeholder=" ">
+                        <label for="co-reference">Ponto de referência (opcional)</label>
+                        <div class="field-line"></div>
+                    </div>
+                </div>
+
+                <div class="checkout-total">
+                    <span>Total</span>
+                    <strong id="checkoutTotal">R$ 0,00</strong>
+                </div>
+
+                <button type="submit" class="btn btn-gold btn-block" id="checkoutSubmit">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Gerar Pix do pedido</span>
+                </button>
+                <p class="cart-note cart-note-center">Geramos um Pix com o valor exato do seu pedido para você pagar na hora.</p>
+            </form>
+        </div>
+
+        <!-- Passo 3 — Pix (QR + Copia e Cola) -->
+        <div class="cart-step" id="cartStepPix" hidden>
+            <div class="pix-head">
+                <span class="pix-check">✝</span>
+                <h4>Pedido registrado!</h4>
+                <p>Pague o Pix abaixo para confirmar. O valor já está no código.</p>
+            </div>
+
+            <div class="pix-total">
+                <span>Valor</span>
+                <strong id="pixTotal">R$ 0,00</strong>
+            </div>
+
+            <div class="pix-qr" id="pixQr" aria-label="QR Code do Pix"></div>
+
+            <label class="pix-label" for="pixCode">Pix Copia e Cola</label>
+            <textarea id="pixCode" class="pix-code" readonly rows="3" aria-label="Código Pix Copia e Cola"></textarea>
+            <button type="button" class="btn btn-gold btn-block" id="pixCopyBtn">
+                <i class="fas fa-copy"></i>
+                <span>Copiar código Pix</span>
+            </button>
+
+            <p class="cart-note cart-note-center">
+                Depois de pagar, envie o comprovante pelo WhatsApp para confirmarmos seu pedido. 🙏
+            </p>
+            <a href="#" class="btn btn-ghost btn-block" id="pixWhatsapp" target="_blank" rel="noopener">
+                <i class="fab fa-whatsapp"></i>
+                <span>Enviar comprovante no WhatsApp</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Gerador de QR Code (vendorizado, MIT — kazuhikoarase/qrcode-generator). Sem CDN. -->
+    <script src="vendor/qrcode.js"></script>
     <script src="script.js"></script>
 </body>
 

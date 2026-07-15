@@ -264,7 +264,12 @@ function populateMenu() {
             + '<span class="bento-tag">' + item.category + '</span>'
             + '<h3>' + item.name + '</h3>'
             + '<p class="bento-desc">' + item.description + '</p>'
+            + '<div class="bento-actions">'
             + '<span class="bento-price">' + item.price + '</span>'
+            + '<button type="button" class="bento-add-btn" data-add="' + item.id + '" aria-label="Adicionar ' + item.name + ' ao carrinho">'
+            + '<i class="fas fa-plus"></i><span>Adicionar</span>'
+            + '</button>'
+            + '</div>'
             + '</div>'
             + '</div>';
     });
@@ -391,4 +396,383 @@ function showNotification(message, type) {
             btn.style.transform = '';
         });
     });
+})();
+
+// ===== Cart & Checkout =====
+(function() {
+    var CART_KEY = 'hdc_cart';
+    var MAX_QTY = 50;
+    var API_CREATE_ORDER = '/api/create-order';
+
+    // ── Helpers de preço ──
+    // "R$ 18,00" -> 1800 (centavos). Usa só os dígitos.
+    function priceToCents(str) {
+        var digits = String(str).replace(/\D/g, '');
+        return parseInt(digits, 10) || 0;
+    }
+    function centsToBRL(cents) {
+        return 'R$ ' + (cents / 100).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+    function findMenuItem(id) {
+        for (var i = 0; i < menuItemsData.length; i++) {
+            if (menuItemsData[i].id === id) return menuItemsData[i];
+        }
+        return null;
+    }
+
+    // ── Estado (localStorage) ──
+    function getCart() {
+        try {
+            var arr = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+            if (!Array.isArray(arr)) return [];
+            // sanitiza e descarta itens que não existem mais no cardápio
+            return arr
+                .filter(function(l) { return l && findMenuItem(l.id); })
+                .map(function(l) {
+                    return { id: l.id, quantity: Math.min(MAX_QTY, Math.max(1, parseInt(l.quantity, 10) || 1)) };
+                });
+        } catch (e) {
+            return [];
+        }
+    }
+    function saveCart(cart) {
+        try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) {}
+        renderCart();
+    }
+    function clearCart() {
+        try { localStorage.removeItem(CART_KEY); } catch (e) {}
+        renderCart();
+    }
+    function addToCart(id) {
+        var cart = getCart();
+        var found = false;
+        for (var i = 0; i < cart.length; i++) {
+            if (cart[i].id === id) {
+                cart[i].quantity = Math.min(MAX_QTY, cart[i].quantity + 1);
+                found = true;
+                break;
+            }
+        }
+        if (!found) cart.push({ id: id, quantity: 1 });
+        saveCart(cart);
+    }
+    function setQty(id, qty) {
+        var cart = getCart()
+            .map(function(l) { return l.id === id ? { id: id, quantity: qty } : l; })
+            .filter(function(l) { return l.quantity > 0; });
+        saveCart(cart);
+    }
+    function removeFromCart(id) {
+        saveCart(getCart().filter(function(l) { return l.id !== id; }));
+    }
+    function cartCount() {
+        return getCart().reduce(function(n, l) { return n + l.quantity; }, 0);
+    }
+    function cartSubtotalCents() {
+        return getCart().reduce(function(sum, l) {
+            var item = findMenuItem(l.id);
+            return sum + (item ? priceToCents(item.price) * l.quantity : 0);
+        }, 0);
+    }
+
+    // ── DOM refs ──
+    var cartBtn = document.getElementById('cartBtn');
+    var cartBadge = document.getElementById('cartBadge');
+    var drawer = document.getElementById('cartDrawer');
+    var backdrop = document.getElementById('cartBackdrop');
+    var cartClose = document.getElementById('cartClose');
+    var stepItems = document.getElementById('cartStepItems');
+    var stepCheckout = document.getElementById('cartStepCheckout');
+    var cartItems = document.getElementById('cartItems');
+    var cartEmpty = document.getElementById('cartEmpty');
+    var cartFoot = document.getElementById('cartFoot');
+    var cartSubtotal = document.getElementById('cartSubtotal');
+    var toCheckoutBtn = document.getElementById('cartToCheckout');
+    var backBtn = document.getElementById('cartBack');
+    var checkoutForm = document.getElementById('checkoutForm');
+    var checkoutTotal = document.getElementById('checkoutTotal');
+    var checkoutSubmit = document.getElementById('checkoutSubmit');
+    var deliveryFields = document.getElementById('deliveryFields');
+    var stepPix = document.getElementById('cartStepPix');
+    var pixQr = document.getElementById('pixQr');
+    var pixCode = document.getElementById('pixCode');
+    var pixTotalEl = document.getElementById('pixTotal');
+    var pixCopyBtn = document.getElementById('pixCopyBtn');
+    var pixWhatsapp = document.getElementById('pixWhatsapp');
+
+    // ── Render ──
+    function renderCart() {
+        var count = cartCount();
+        if (cartBadge) {
+            cartBadge.textContent = count;
+            cartBadge.hidden = count === 0;
+        }
+        if (cartBtn) {
+            cartBtn.classList.remove('bump');
+            if (count > 0) {
+                // reinicia a animação de "pulo"
+                void cartBtn.offsetWidth;
+                cartBtn.classList.add('bump');
+            }
+        }
+
+        var cart = getCart();
+        if (cartItems) {
+            if (cart.length === 0) {
+                cartItems.innerHTML = '';
+                if (cartEmpty) cartEmpty.hidden = false;
+                if (cartFoot) cartFoot.hidden = true;
+            } else {
+                if (cartEmpty) cartEmpty.hidden = true;
+                if (cartFoot) cartFoot.hidden = false;
+                var html = '';
+                cart.forEach(function(l) {
+                    var item = findMenuItem(l.id);
+                    if (!item) return;
+                    var lineCents = priceToCents(item.price) * l.quantity;
+                    html += '<div class="cart-item" data-id="' + item.id + '">'
+                        + '<img src="' + item.image + '" alt="' + item.name + '" class="cart-item-img" loading="lazy">'
+                        + '<div class="cart-item-info">'
+                        + '<h4>' + item.name + '</h4>'
+                        + '<span class="cart-item-price">' + centsToBRL(lineCents) + '</span>'
+                        + '<div class="cart-qty">'
+                        + '<button type="button" class="cart-qty-btn" data-action="dec" aria-label="Diminuir">&minus;</button>'
+                        + '<span class="cart-qty-val">' + l.quantity + '</span>'
+                        + '<button type="button" class="cart-qty-btn" data-action="inc" aria-label="Aumentar">+</button>'
+                        + '<button type="button" class="cart-item-remove" data-action="remove" aria-label="Remover item"><i class="fas fa-trash-alt"></i></button>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>';
+                });
+                cartItems.innerHTML = html;
+            }
+        }
+        var subtotal = centsToBRL(cartSubtotalCents());
+        if (cartSubtotal) cartSubtotal.textContent = subtotal;
+        if (checkoutTotal) checkoutTotal.textContent = subtotal;
+    }
+
+    // ── Abrir / fechar drawer ──
+    function openCart() {
+        if (!drawer) return;
+        showStep('items');
+        drawer.classList.add('active');
+        drawer.setAttribute('aria-hidden', 'false');
+        if (backdrop) backdrop.hidden = false;
+        document.body.classList.add('cart-open');
+    }
+    function closeCart() {
+        if (!drawer) return;
+        drawer.classList.remove('active');
+        drawer.setAttribute('aria-hidden', 'true');
+        if (backdrop) backdrop.hidden = true;
+        document.body.classList.remove('cart-open');
+    }
+    function showStep(step) {
+        if (!stepItems || !stepCheckout) return;
+        stepItems.hidden = step !== 'items';
+        stepCheckout.hidden = step !== 'checkout';
+        if (stepPix) stepPix.hidden = step !== 'pix';
+    }
+
+    // ── Eventos ──
+    if (cartBtn) cartBtn.addEventListener('click', openCart);
+    if (cartClose) cartClose.addEventListener('click', closeCart);
+    if (backdrop) backdrop.addEventListener('click', closeCart);
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && drawer && drawer.classList.contains('active')) closeCart();
+    });
+
+    // Adicionar ao carrinho (delegação — os botões nascem via populateMenu)
+    document.addEventListener('click', function(e) {
+        var addBtn = e.target.closest ? e.target.closest('[data-add]') : null;
+        if (!addBtn) return;
+        var id = parseInt(addBtn.getAttribute('data-add'), 10);
+        if (!findMenuItem(id)) return;
+        addToCart(id);
+        var item = findMenuItem(id);
+        showNotification((item ? item.name : 'Item') + ' adicionado ao carrinho! 🛒', 'success');
+    });
+
+    // Controles de quantidade / remover (delegação dentro da lista)
+    if (cartItems) {
+        cartItems.addEventListener('click', function(e) {
+            var btn = e.target.closest ? e.target.closest('[data-action]') : null;
+            if (!btn) return;
+            var row = btn.closest('.cart-item');
+            if (!row) return;
+            var id = parseInt(row.getAttribute('data-id'), 10);
+            var action = btn.getAttribute('data-action');
+            var current = 0;
+            getCart().forEach(function(l) { if (l.id === id) current = l.quantity; });
+
+            if (action === 'inc') setQty(id, Math.min(MAX_QTY, current + 1));
+            else if (action === 'dec') setQty(id, current - 1);
+            else if (action === 'remove') removeFromCart(id);
+        });
+    }
+
+    if (toCheckoutBtn) {
+        toCheckoutBtn.addEventListener('click', function() {
+            if (cartCount() === 0) return;
+            showStep('checkout');
+        });
+    }
+    if (backBtn) backBtn.addEventListener('click', function() { showStep('items'); });
+
+    // Toggle retirada / entrega
+    if (checkoutForm) {
+        checkoutForm.addEventListener('change', function(e) {
+            if (e.target.name !== 'fulfillment') return;
+            var isDelivery = getFulfillment() === 'delivery';
+            if (deliveryFields) deliveryFields.hidden = !isDelivery;
+        });
+    }
+    function getFulfillment() {
+        var checked = checkoutForm ? checkoutForm.querySelector('input[name="fulfillment"]:checked') : null;
+        return checked && checked.value === 'delivery' ? 'delivery' : 'pickup';
+    }
+
+    // ── Submit do checkout ──
+    function setLoading(loading) {
+        if (!checkoutSubmit) return;
+        checkoutSubmit.disabled = loading;
+        checkoutSubmit.classList.toggle('is-loading', loading);
+        var label = checkoutSubmit.querySelector('span');
+        if (label) label.textContent = loading ? 'Processando...' : 'Gerar Pix do pedido';
+    }
+
+    // Gera o objeto QR a partir do payload Pix (lib vendorizada, roda no navegador).
+    function makeQr(text) {
+        if (typeof qrcode === 'undefined') return null;
+        // Tenta o tamanho automático (0); se a versão não aceitar, varre de 4 a 40.
+        try { var q = qrcode(0, 'M'); q.addData(text); q.make(); return q; } catch (e) {}
+        for (var t = 4; t <= 40; t++) {
+            try { var qq = qrcode(t, 'M'); qq.addData(text); qq.make(); return qq; } catch (e2) {}
+        }
+        return null;
+    }
+
+    function showPix(payload, totalFormatted) {
+        if (pixTotalEl) pixTotalEl.textContent = totalFormatted || '';
+        if (pixCode) pixCode.value = payload;
+
+        if (pixQr) {
+            var qr = makeQr(payload);
+            // Fallback: se o QR não gerar, o Copia e Cola ainda resolve.
+            pixQr.innerHTML = qr
+                ? qr.createImgTag(5, 12, 'QR Code Pix')
+                : '<p class="pix-qr-fallback">Use o código Copia e Cola abaixo.</p>';
+        }
+
+        if (pixWhatsapp) {
+            var msg = 'Olá! Fiz um pedido na Hamburgada da Cruz'
+                + (totalFormatted ? ' no valor de ' + totalFormatted : '')
+                + ' e já paguei o Pix. Segue o comprovante:';
+            pixWhatsapp.href = 'https://wa.me/5583999999999?text=' + encodeURIComponent(msg);
+        }
+
+        showStep('pix');
+    }
+
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var cart = getCart();
+            if (cart.length === 0) {
+                showNotification('Seu carrinho está vazio.', 'error');
+                showStep('items');
+                return;
+            }
+
+            var name = valueOf('co-name');
+            var phone = valueOf('co-phone');
+            var email = valueOf('co-email');
+            var fulfillment = getFulfillment();
+
+            if (name.length < 2) { showNotification('Por favor, informe seu nome.', 'error'); return; }
+            if (phone.replace(/\D/g, '').length < 10) { showNotification('Informe um telefone válido com DDD.', 'error'); return; }
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showNotification('E-mail inválido.', 'error'); return; }
+
+            var customer = { name: name, phone: phone, email: email, fulfillment: fulfillment };
+
+            if (fulfillment === 'delivery') {
+                var address = {
+                    street: valueOf('co-street'),
+                    number: valueOf('co-number'),
+                    district: valueOf('co-district'),
+                    complement: valueOf('co-complement'),
+                    reference: valueOf('co-reference')
+                };
+                if (!address.street || !address.number || !address.district) {
+                    showNotification('Preencha rua, número e bairro da entrega.', 'error');
+                    return;
+                }
+                customer.address = address;
+            }
+
+            var payload = {
+                items: cart.map(function(l) { return { id: l.id, quantity: l.quantity }; }),
+                customer: customer
+            };
+
+            setLoading(true);
+            fetch(API_CREATE_ORDER, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(function(r) {
+                    return r.json().then(function(data) { return { ok: r.ok, data: data }; });
+                })
+                .then(function(res) {
+                    if (!res.ok || !res.data || !res.data.pix_payload) {
+                        throw new Error((res.data && res.data.error) || 'Não foi possível gerar o pagamento.');
+                    }
+                    // Mostra o Pix (QR + Copia e Cola) gerado no servidor.
+                    showPix(res.data.pix_payload, res.data.total_formatted);
+                    clearCart(); // pedido já registrado no servidor
+                    setLoading(false);
+                })
+                .catch(function(err) {
+                    showNotification(err.message || 'Erro ao processar o pedido. Tente novamente.', 'error');
+                    setLoading(false);
+                });
+        });
+    }
+    function valueOf(id) {
+        var el = document.getElementById(id);
+        return el ? el.value.trim() : '';
+    }
+
+    // ── Copiar o código Pix (Copia e Cola) ──
+    if (pixCopyBtn) {
+        pixCopyBtn.addEventListener('click', function() {
+            var text = pixCode ? pixCode.value : '';
+            if (!text) return;
+
+            function done() { showNotification('Código Pix copiado! 📋', 'success'); }
+            function legacyCopy() {
+                if (!pixCode) return;
+                pixCode.removeAttribute('readonly');
+                pixCode.select();
+                try { document.execCommand('copy'); done(); } catch (e) {}
+                pixCode.setAttribute('readonly', 'readonly');
+                if (window.getSelection) window.getSelection().removeAllRanges();
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done).catch(legacyCopy);
+            } else {
+                legacyCopy();
+            }
+        });
+    }
+
+    // Render inicial
+    renderCart();
 })();

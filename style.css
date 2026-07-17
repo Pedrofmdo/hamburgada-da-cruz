@@ -2431,8 +2431,14 @@ a {
     pointer-events: none;
 }
 
-body.cart-open {
-    overflow: hidden;
+/* Trava a rolagem só onde a sacola cobre a tela toda (mesmo breakpoint
+   que faz .cart-drawer virar width:100vw, lá embaixo). Acima disso a
+   página continua rolando atrás da sacola aberta, pra dar pra escolher
+   mais itens do cardápio sem fechar/abrir. */
+@media (max-width: 480px) {
+    body.cart-open {
+        overflow: hidden;
+    }
 }
 
 .cart-drawer {
@@ -2896,9 +2902,9 @@ body.cart-open {
 
 .pix-whatsapp-sticky {
     position: sticky;
-    bottom: -28px;
-    margin: 18px -24px -28px;
-    padding: 16px 24px calc(20px + env(safe-area-inset-bottom));
+    bottom: 0;
+    margin: 18px 0 0;
+    padding: 14px 0 calc(4px + env(safe-area-inset-bottom));
     background: var(--bg-surface);
     border-top: 1px solid var(--border-subtle);
     box-shadow: 0 -12px 24px -8px rgba(5, 8, 20, 0.6);

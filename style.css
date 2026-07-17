@@ -1064,6 +1064,9 @@ a {
     right: 0;
     padding: 32px;
     background: linear-gradient(to top, rgba(11, 11, 12, 0.95) 0%, rgba(11, 11, 12, 0.5) 60%, transparent 100%);
+    /* Linha sutil separando a foto da área de texto — fica visível mesmo
+       em fotos escuras, que sem isso se confundem com o fundo do card. */
+    border-top: 1px solid var(--border-glow);
     z-index: 2;
 }
 

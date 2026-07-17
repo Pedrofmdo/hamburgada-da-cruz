@@ -279,7 +279,7 @@ var menuItemsData = [
     },
     {
         id: 5,
-        name: "Refrigerante",
+        name: "Coca-Cola",
         description: "Lata ou copo 300ml",
         price: "R$ 8,00",
         image: "IMGS/Hamburguer sendo mostrado.jpg",
@@ -287,6 +287,30 @@ var menuItemsData = [
     },
     {
         id: 6,
+        name: "Coca-Cola Zero",
+        description: "Lata ou copo 300ml",
+        price: "R$ 8,00",
+        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        category: "acompanhamento"
+    },
+    {
+        id: 7,
+        name: "Guaraná",
+        description: "Lata ou copo 300ml",
+        price: "R$ 8,00",
+        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        category: "acompanhamento"
+    },
+    {
+        id: 8,
+        name: "Guaraná Zero",
+        description: "Lata ou copo 300ml",
+        price: "R$ 8,00",
+        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        category: "acompanhamento"
+    },
+    {
+        id: 9,
         name: "Cookie Chocochip",
         description: "Massa tradicional, com gotas de chocolate e finalizado com flor de sal",
         price: "R$ 14,00",
@@ -294,7 +318,7 @@ var menuItemsData = [
         category: "cookie"
     },
     {
-        id: 7,
+        id: 10,
         name: "Cookie Duplochoco",
         description: "Massa de cacau 100%, com gotas de chocolate branco",
         price: "R$ 14,00",
@@ -302,7 +326,7 @@ var menuItemsData = [
         category: "cookie"
     },
     {
-        id: 8,
+        id: 11,
         name: "Cookie Nutella",
         description: "Massa tradicional, gotas de chocolate preto, recheio de nutella e finalizado com flor de sal",
         price: "R$ 18,00",
@@ -310,7 +334,7 @@ var menuItemsData = [
         category: "cookie"
     },
     {
-        id: 9,
+        id: 12,
         name: "Cookie Limão Siciliano com Frutas Vermelhas",
         description: "Massa tradicional, gotas de chocolate branco, recheado de brigadeiro de limão siciliano e geleia de frutas vermelhas",
         price: "R$ 18,00",
@@ -318,7 +342,7 @@ var menuItemsData = [
         category: "cookie"
     },
     {
-        id: 10,
+        id: 13,
         name: "Cookie Red Fruit",
         description: "Massa red velvet e gotas de chocolate branco, recheado com brigadeiro de cream cheese e geleia de frutas vermelhas",
         price: "R$ 18,00",

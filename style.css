@@ -2914,6 +2914,8 @@ a {
 
 .pix-code {
     width: 100%;
+    min-height: 74px;
+    flex-shrink: 0;
     padding: 14px;
     margin-bottom: 12px;
     background: var(--bg-card);

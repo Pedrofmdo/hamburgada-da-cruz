@@ -34,6 +34,10 @@
     <div class="cursor-glow" id="cursorGlow"></div>
 
     <!-- WhatsApp Floating Button — Minimalista -->
+    <div class="whatsapp-tooltip" id="whatsappTooltip">
+        <button type="button" class="whatsapp-tooltip-close" id="whatsappTooltipClose" aria-label="Fechar aviso">&times;</button>
+        <span>Faça seu pedido pelo WhatsApp, ou tire dúvidas! 💬</span>
+    </div>
     <a href="https://wa.me/558388403579" class="whatsapp-fab" id="whatsappFab" target="_blank"
         aria-label="Fazer pedido pelo WhatsApp">
         <div class="fab-pulse"></div>
@@ -595,10 +599,11 @@
                 <span>Copiar código Pix</span>
             </button>
 
-            <p class="cart-note cart-note-center">
-                Depois de pagar, envie o comprovante pelo WhatsApp para confirmarmos seu pedido. 🙏
-            </p>
-            <a class="btn btn-ghost btn-block" id="pixWhatsapp" target="_blank" rel="noopener">
+            <div class="pix-whatsapp-alert">
+                <i class="fas fa-triangle-exclamation"></i>
+                <p>Seu pedido só é confirmado depois que você <strong>enviar o comprovante pelo WhatsApp</strong>. Não esqueça! 🙏</p>
+            </div>
+            <a class="btn btn-whatsapp btn-block" id="pixWhatsapp" target="_blank" rel="noopener">
                 <i class="fab fa-whatsapp"></i>
                 <span>Enviar comprovante no WhatsApp</span>
             </a>

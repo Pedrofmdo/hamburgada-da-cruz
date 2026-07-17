@@ -19,6 +19,34 @@
     setTimeout(hidePreloader, 4000);
 })();
 
+// ===== Balão do WhatsApp (FAB) =====
+(function() {
+    var tooltip = document.getElementById('whatsappTooltip');
+    var closeBtn = document.getElementById('whatsappTooltipClose');
+    var fab = document.getElementById('whatsappFab');
+    if (!tooltip) return;
+
+    var DISMISS_KEY = 'hdc_wa_tooltip_dismissed';
+
+    function dismiss() {
+        tooltip.classList.add('hidden');
+        try { localStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
+    }
+
+    try {
+        if (localStorage.getItem(DISMISS_KEY)) tooltip.classList.add('hidden');
+    } catch (e) {}
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dismiss();
+        });
+    }
+    if (fab) fab.addEventListener('click', dismiss);
+})();
+
 // ===== Cursor Glow =====
 (function() {
     var glow = document.getElementById('cursorGlow');

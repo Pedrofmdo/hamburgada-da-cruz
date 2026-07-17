@@ -704,7 +704,38 @@ function showNotification(message, type) {
         return null;
     }
 
-    function showPix(payload, totalFormatted) {
+    // Monta a mensagem do WhatsApp com o resumo do pedido (itens, total, local de
+    // retirada/endereço de entrega) — pronta pra enviar junto com o comprovante.
+    function buildOrderMessage(cart, customer, totalFormatted) {
+        var lines = ['Olá! Acabei de fazer um pedido na Hamburgada da Cruz e já paguei o Pix. Segue o comprovante:', ''];
+
+        lines.push('*Pedido:*');
+        (cart || []).forEach(function(l) {
+            var item = findMenuItem(l.id);
+            var name = item ? item.name : ('Item #' + l.id);
+            lines.push('• ' + l.quantity + 'x ' + name);
+        });
+        lines.push('');
+        lines.push('*Total:* ' + (totalFormatted || ''));
+
+        if (customer) {
+            if (customer.name) lines.push('*Nome:* ' + customer.name);
+            if (customer.fulfillment === 'delivery' && customer.address) {
+                var a = customer.address;
+                var addr = [a.street, a.number].filter(Boolean).join(', ');
+                if (a.district) addr += (addr ? ' - ' : '') + a.district;
+                lines.push('*Entrega:* ' + addr);
+                if (a.complement) lines.push('*Complemento:* ' + a.complement);
+                if (a.reference) lines.push('*Referência:* ' + a.reference);
+            } else {
+                lines.push('*Retirada:* no local');
+            }
+        }
+
+        return lines.join('\n');
+    }
+
+    function showPix(payload, totalFormatted, cart, customer) {
         if (pixTotalEl) pixTotalEl.textContent = totalFormatted || '';
         if (pixCode) pixCode.value = payload;
 
@@ -717,9 +748,7 @@ function showNotification(message, type) {
         }
 
         if (pixWhatsapp) {
-            var msg = 'Olá! Fiz um pedido na Hamburgada da Cruz'
-                + (totalFormatted ? ' no valor de ' + totalFormatted : '')
-                + ' e já paguei o Pix. Segue o comprovante:';
+            var msg = buildOrderMessage(cart, customer, totalFormatted);
             pixWhatsapp.href = 'https://wa.me/558388403579?text=' + encodeURIComponent(msg);
         }
 
@@ -782,7 +811,8 @@ function showNotification(message, type) {
                         throw new Error((res.data && res.data.error) || 'Não foi possível gerar o pagamento.');
                     }
                     // Mostra o Pix (QR + Copia e Cola) gerado no servidor.
-                    showPix(res.data.pix_payload, res.data.total_formatted);
+                    // Passa cart/customer ANTES de limpar, pra montar a mensagem do WhatsApp.
+                    showPix(res.data.pix_payload, res.data.total_formatted, cart, customer);
                     clearCart(); // pedido já registrado no servidor
                     setLoading(false);
                 })

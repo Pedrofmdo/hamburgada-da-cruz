@@ -282,7 +282,7 @@ var menuItemsData = [
         name: "Coca-Cola",
         description: "Lata ou copo 300ml",
         price: "R$ 8,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/Refrigerante.jpg",
         category: "acompanhamento"
     },
     {
@@ -290,7 +290,7 @@ var menuItemsData = [
         name: "Coca-Cola Zero",
         description: "Lata ou copo 300ml",
         price: "R$ 8,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/Refrigerante.jpg",
         category: "acompanhamento"
     },
     {
@@ -298,7 +298,7 @@ var menuItemsData = [
         name: "Guaraná",
         description: "Lata ou copo 300ml",
         price: "R$ 8,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/Refrigerante.jpg",
         category: "acompanhamento"
     },
     {
@@ -306,7 +306,7 @@ var menuItemsData = [
         name: "Guaraná Zero",
         description: "Lata ou copo 300ml",
         price: "R$ 8,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/Refrigerante.jpg",
         category: "acompanhamento"
     },
     {

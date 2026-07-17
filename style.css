@@ -366,10 +366,6 @@ a {
     text-shadow: 0 0 10px var(--gold-glow);
 }
 
-.logo-dot {
-    color: var(--gold);
-}
-
 .primary-nav .nav-list {
     display: flex;
     gap: 36px;
@@ -2428,10 +2424,11 @@ a {
 .cart-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(5, 8, 20, 0.62);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: rgba(5, 8, 20, 0.28);
     z-index: 1002;
+    /* Não bloqueia cliques — dá pra continuar adicionando itens do cardápio
+       com a sacola aberta. Fechar é só pelo X ou tecla Esc. */
+    pointer-events: none;
 }
 
 body.cart-open {
@@ -2897,11 +2894,21 @@ body.cart-open {
     border-color: var(--gold);
 }
 
+.pix-whatsapp-sticky {
+    position: sticky;
+    bottom: -28px;
+    margin: 18px -24px -28px;
+    padding: 16px 24px calc(20px + env(safe-area-inset-bottom));
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
+    box-shadow: 0 -12px 24px -8px rgba(5, 8, 20, 0.6);
+}
+
 .pix-whatsapp-alert {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    margin: 18px 0 12px;
+    margin: 0 0 12px;
     padding: 14px 16px;
     background: rgba(37, 211, 102, 0.12);
     border: 1px solid rgba(37, 211, 102, 0.4);

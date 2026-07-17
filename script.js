@@ -264,7 +264,7 @@ var menuItemsData = [
     {
         id: 3,
         name: "Batata e Refrigerante",
-        description: "Porção de batata frita crocante + refrigerante 300ml",
+        description: "Porção de batata frita crocante + refrigerante lata 350ml",
         price: "R$ 15,00",
         image: "IMGS/BatataRefrigerante.jpg",
         category: "acompanhamento"
@@ -280,7 +280,7 @@ var menuItemsData = [
     {
         id: 5,
         name: "Coca-Cola",
-        description: "Lata ou copo 300ml",
+        description: "Lata 350ml",
         price: "R$ 8,00",
         image: "IMGS/Refrigerante.jpg",
         category: "acompanhamento"
@@ -288,7 +288,7 @@ var menuItemsData = [
     {
         id: 6,
         name: "Coca-Cola Zero",
-        description: "Lata ou copo 300ml",
+        description: "Lata 350ml",
         price: "R$ 8,00",
         image: "IMGS/Refrigerante.jpg",
         category: "acompanhamento"
@@ -296,7 +296,7 @@ var menuItemsData = [
     {
         id: 7,
         name: "Guaraná",
-        description: "Lata ou copo 300ml",
+        description: "Lata 350ml",
         price: "R$ 8,00",
         image: "IMGS/Guarana.jpg",
         category: "acompanhamento"
@@ -304,9 +304,9 @@ var menuItemsData = [
     {
         id: 8,
         name: "Guaraná Zero",
-        description: "Lata ou copo 300ml",
+        description: "Lata 350ml",
         price: "R$ 8,00",
-        image: "IMGS/Refrigerante.jpg",
+        image: "IMGS/Guarana.jpg",
         category: "acompanhamento"
     },
     {

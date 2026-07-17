@@ -1048,7 +1048,7 @@ a {
 
 .bento-item .bento-img {
     width: 100%;
-    height: 280px;
+    height: 340px;
     object-fit: cover;
     transition: transform var(--t-slow) var(--ease-out);
 }
@@ -1085,8 +1085,13 @@ a {
     font-family: var(--font-display);
     font-size: 1.4rem;
     font-weight: 700;
+    line-height: 1.25;
     color: var(--text-primary);
     margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .bento-item .bento-desc {
@@ -1485,6 +1490,34 @@ a {
     font-size: 0.88rem;
     color: var(--text-secondary);
     line-height: 1.5;
+}
+
+.contact-card-pix {
+    text-align: center;
+}
+
+.contact-card-pix .contact-card-icon {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-pix-qr {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 96px;
+    margin: 10px auto 8px;
+    padding: 6px;
+    background: #ffffff;
+    border-radius: var(--radius-sm);
+}
+
+.contact-pix-qr img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
 }
 
 /* Contact Form */

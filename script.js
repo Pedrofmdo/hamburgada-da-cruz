@@ -30,11 +30,11 @@
 
     function dismiss() {
         tooltip.classList.add('hidden');
-        try { localStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
+        try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
     }
 
     try {
-        if (localStorage.getItem(DISMISS_KEY)) tooltip.classList.add('hidden');
+        if (sessionStorage.getItem(DISMISS_KEY)) tooltip.classList.add('hidden');
     } catch (e) {}
 
     if (closeBtn) {
@@ -454,6 +454,25 @@ function showNotification(message, type) {
         setTimeout(function() { notification.remove(); }, 400);
     }, 3500);
 }
+
+// ===== QR Code Pix — Doação (valor livre, sem pedido) =====
+(function() {
+    var el = document.getElementById('donateQr');
+    if (!el || typeof qrcode === 'undefined') return;
+
+    // BR Code estático da chave Pix, sem valor fixo (o doador digita o
+    // valor no próprio app do banco). Gerado uma única vez — não muda.
+    var DONATE_PIX_PAYLOAD = '00020126480014br.gov.bcb.pix0126financeirocmcc@outlook.com5204000053039865802BR5918HAMBURGADA DA CRUZ6011JOAO PESSOA62070503***6304BD9F';
+
+    try {
+        var qr = qrcode(0, 'M');
+        qr.addData(DONATE_PIX_PAYLOAD);
+        qr.make();
+        el.innerHTML = qr.createImgTag(4, 8, 'QR Code Pix para doação');
+    } catch (e) {
+        el.remove();
+    }
+})();
 
 // ===== Footer Year =====
 (function() {

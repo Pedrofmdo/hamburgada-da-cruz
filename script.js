@@ -298,7 +298,7 @@ var menuItemsData = [
         name: "Guaraná",
         description: "Lata ou copo 300ml",
         price: "R$ 8,00",
-        image: "IMGS/Refrigerante.jpg",
+        image: "IMGS/61.webp",
         category: "acompanhamento"
     },
     {
@@ -314,7 +314,7 @@ var menuItemsData = [
         name: "Cookie Chocochip",
         description: "Massa tradicional, com gotas de chocolate e finalizado com flor de sal",
         price: "R$ 14,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/Chocochip.jpeg",
         category: "cookie"
     },
     {
@@ -322,7 +322,7 @@ var menuItemsData = [
         name: "Cookie Duplochoco",
         description: "Massa de cacau 100%, com gotas de chocolate branco",
         price: "R$ 14,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/Duplochoco.jpeg",
         category: "cookie"
     },
     {
@@ -330,7 +330,7 @@ var menuItemsData = [
         name: "Cookie Nutella",
         description: "Massa tradicional, gotas de chocolate preto, recheio de nutella e finalizado com flor de sal",
         price: "R$ 18,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/Nutela.jpeg",
         category: "cookie"
     },
     {
@@ -338,7 +338,7 @@ var menuItemsData = [
         name: "Cookie Limão Siciliano com Frutas Vermelhas",
         description: "Massa tradicional, gotas de chocolate branco, recheado de brigadeiro de limão siciliano e geleia de frutas vermelhas",
         price: "R$ 18,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/Cookie-Limão-Frutas-vermelhas.jpeg",
         category: "cookie"
     },
     {
@@ -346,7 +346,7 @@ var menuItemsData = [
         name: "Cookie Red Fruit",
         description: "Massa red velvet e gotas de chocolate branco, recheado com brigadeiro de cream cheese e geleia de frutas vermelhas",
         price: "R$ 18,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/Redvelvet.jpeg",
         category: "cookie"
     }
 ];

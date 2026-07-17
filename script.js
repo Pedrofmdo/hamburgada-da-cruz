@@ -219,35 +219,83 @@ function animateCounter(element, target) {
 var menuItemsData = [
     {
         id: 1,
-        name: "X-Burger Individual",
+        name: "Cheeseburger",
         description: "Pão artesanal, hambúrguer 100g, queijo cheddar, alface, tomate e molho especial",
         price: "R$ 18,00",
         image: "IMGS/Hamburguer sendo mostrado.jpg",
-        category: "individual"
+        category: "hamburguer"
     },
     {
         id: 2,
-        name: "X-Burger Combo",
-        description: "X-Burger individual + batata frita média + refrigerante 300ml",
-        price: "R$ 32,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
-        category: "combo"
-    },
-    {
-        id: 3,
-        name: "X-Bacon Individual",
+        name: "Cheeseburger Bacon",
         description: "Pão artesanal, hambúrguer 100g, queijo cheddar, bacon crocante, alface e molho da casa",
         price: "R$ 20,00",
         image: "IMGS/Hamburguer sendo mostrado.jpg",
-        category: "individual"
+        category: "hamburguer"
+    },
+    {
+        id: 3,
+        name: "Batata e Refrigerante",
+        description: "Porção de batata frita crocante + refrigerante 300ml",
+        price: "R$ 15,00",
+        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        category: "acompanhamento"
     },
     {
         id: 4,
-        name: "X-Bacon Combo",
-        description: "X-Bacon individual + batata frita média + refrigerante 300ml",
-        price: "R$ 35,00",
+        name: "Batata",
+        description: "Porção de batata frita crocante",
+        price: "R$ 8,00",
         image: "IMGS/Hamburguer sendo mostrado.jpg",
-        category: "combo"
+        category: "acompanhamento"
+    },
+    {
+        id: 5,
+        name: "Refrigerante",
+        description: "Lata ou copo 300ml",
+        price: "R$ 8,00",
+        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        category: "acompanhamento"
+    },
+    {
+        id: 6,
+        name: "Cookie Chocochip",
+        description: "Massa tradicional, com gotas de chocolate e finalizado com flor de sal",
+        price: "R$ 14,00",
+        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        category: "cookie"
+    },
+    {
+        id: 7,
+        name: "Cookie Duplochoco",
+        description: "Massa de cacau 100%, com gotas de chocolate branco",
+        price: "R$ 14,00",
+        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        category: "cookie"
+    },
+    {
+        id: 8,
+        name: "Cookie Nutella",
+        description: "Massa tradicional, gotas de chocolate preto, recheio de nutella e finalizado com flor de sal",
+        price: "R$ 18,00",
+        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        category: "cookie"
+    },
+    {
+        id: 9,
+        name: "Cookie Limão Siciliano com Frutas Vermelhas",
+        description: "Massa tradicional, gotas de chocolate branco, recheado de brigadeiro de limão siciliano e geleia de frutas vermelhas",
+        price: "R$ 18,00",
+        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        category: "cookie"
+    },
+    {
+        id: 10,
+        name: "Cookie Red Fruit",
+        description: "Massa red velvet e gotas de chocolate branco, recheado com brigadeiro de cream cheese e geleia de frutas vermelhas",
+        price: "R$ 18,00",
+        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        category: "cookie"
     }
 ];
 
@@ -672,7 +720,7 @@ function showNotification(message, type) {
             var msg = 'Olá! Fiz um pedido na Hamburgada da Cruz'
                 + (totalFormatted ? ' no valor de ' + totalFormatted : '')
                 + ' e já paguei o Pix. Segue o comprovante:';
-            pixWhatsapp.href = 'https://wa.me/5583999999999?text=' + encodeURIComponent(msg);
+            pixWhatsapp.href = 'https://wa.me/558388403579?text=' + encodeURIComponent(msg);
         }
 
         showStep('pix');

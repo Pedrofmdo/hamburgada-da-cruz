@@ -266,7 +266,7 @@ var menuItemsData = [
         name: "Batata e Refrigerante",
         description: "Porção de batata frita crocante + refrigerante 300ml",
         price: "R$ 15,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/BatataRefrigerante.jpg",
         category: "acompanhamento"
     },
     {
@@ -274,7 +274,7 @@ var menuItemsData = [
         name: "Batata",
         description: "Porção de batata frita crocante",
         price: "R$ 8,00",
-        image: "IMGS/Hamburguer sendo mostrado.jpg",
+        image: "IMGS/Batata.jpg",
         category: "acompanhamento"
     },
     {
@@ -298,7 +298,7 @@ var menuItemsData = [
         name: "Guaraná",
         description: "Lata ou copo 300ml",
         price: "R$ 8,00",
-        image: "IMGS/61.webp",
+        image: "IMGS/Guarana.jpg",
         category: "acompanhamento"
     },
     {

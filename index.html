@@ -365,39 +365,25 @@
                     </div>
                     <div class="contact-card contact-card-pix">
                         <div class="contact-card-icon"><i class="fas fa-heart"></i></div>
-                        <h3>Apoie com um Pix</h3>
-                        <div class="contact-pix-qr" id="donateQr" aria-label="QR Code Pix para doação"></div>
-                        <p>Escaneie e doe qualquer valor 🙏</p>
+                        <h3>Chave Pix</h3>
+                        <p class="contact-pix-key" id="donateKeyText">financeirocmcc@outlook.com</p>
+                        <button type="button" class="contact-pix-copy" id="donateCopyBtn">
+                            <i class="fas fa-copy"></i>
+                            <span>Copiar chave</span>
+                        </button>
                     </div>
                 </div>
 
-                <form id="contactForm" class="contact-form" novalidate>
-                    <h3 class="form-headline">Envie uma mensagem</h3>
-                    <div class="form-field">
-                        <input type="text" id="form-name" name="name" placeholder=" " required>
-                        <label for="form-name">Seu nome</label>
-                        <div class="field-line"></div>
-                    </div>
-                    <div class="form-field">
-                        <input type="email" id="form-email" name="email" placeholder=" " required>
-                        <label for="form-email">Seu e-mail</label>
-                        <div class="field-line"></div>
-                    </div>
-                    <div class="form-field">
-                        <input type="tel" id="form-phone" name="phone" placeholder=" ">
-                        <label for="form-phone">Telefone (opcional)</label>
-                        <div class="field-line"></div>
-                    </div>
-                    <div class="form-field">
-                        <textarea id="form-message" name="message" placeholder=" " rows="4" required></textarea>
-                        <label for="form-message">Sua mensagem</label>
-                        <div class="field-line"></div>
-                    </div>
-                    <button type="submit" class="btn btn-gold btn-block">
-                        <i class="fas fa-paper-plane"></i>
-                        <span>Enviar Mensagem</span>
-                    </button>
-                </form>
+                <div class="donate-panel">
+                    <span class="donate-cross">✝</span>
+                    <h3 class="donate-headline">Apoie nossa missão</h3>
+                    <p class="donate-text">
+                        Cada doação ajuda a manter o trabalho da comunidade. Escaneie o QR Code
+                        com o app do seu banco e doe o valor que quiser.
+                    </p>
+                    <div class="donate-qr" id="donateQr" aria-label="QR Code Pix para doação"></div>
+                    <p class="donate-note">Pix • Hamburgada da Cruz 🙏</p>
+                </div>
             </div>
         </div>
     </section>

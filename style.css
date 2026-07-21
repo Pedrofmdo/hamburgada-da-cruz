@@ -1492,51 +1492,100 @@ a {
     line-height: 1.5;
 }
 
-.contact-card-pix {
-    text-align: center;
+.contact-pix-key {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--gold);
+    /* A chave é um e-mail longo — quebra em vez de estourar o card. */
+    overflow-wrap: anywhere;
+    margin-bottom: 12px;
 }
 
-.contact-card-pix .contact-card-icon {
-    margin-left: auto;
-    margin-right: auto;
+.contact-pix-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    background: var(--gold-glow);
+    border: 1px solid var(--border-glow);
+    color: var(--gold);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--t-fast) var(--ease-out);
 }
 
-.contact-pix-qr {
+.contact-pix-copy:hover {
+    background: var(--gold);
+    color: var(--bg-deep);
+    border-color: var(--gold);
+}
+
+/* Painel de doação (QR grande) */
+.donate-panel {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 96px;
-    height: 96px;
-    margin: 10px auto 8px;
-    padding: 6px;
-    background: #ffffff;
-    border-radius: var(--radius-sm);
-}
-
-.contact-pix-qr img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    image-rendering: pixelated;
-}
-
-/* Contact Form */
-.contact-form {
+    text-align: center;
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-xl);
-    padding: 48px;
+    padding: 48px 40px;
 }
 
-.form-headline {
+.donate-cross {
+    font-size: 2rem;
+    color: var(--gold);
+    text-shadow: 0 0 30px var(--gold-glow-strong);
+    margin-bottom: 10px;
+}
+
+.donate-headline {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 36px;
-    text-align: center;
+    margin-bottom: 12px;
 }
 
+.donate-text {
+    font-size: 0.94rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    max-width: 340px;
+    margin-bottom: 28px;
+}
+
+.donate-qr {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+}
+
+.donate-qr img {
+    display: block;
+    width: 200px;
+    max-width: 55vw;
+    height: auto;
+    image-rendering: pixelated;
+}
+
+.donate-note {
+    margin-top: 18px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+/* Contact Form */
 .form-field {
     position: relative;
     margin-bottom: 28px;
@@ -1864,7 +1913,8 @@ a {
 
     .contact-bento { grid-template-columns: 1fr; }
 
-    .ribbon-grid { grid-template-columns: repeat(2, 1fr); }
+    /* São 3 itens: em 2 colunas sobraria um sozinho na segunda linha. */
+    .ribbon-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
     .footer-top { grid-template-columns: 1fr; gap: 40px; }
 
@@ -2132,14 +2182,13 @@ a {
         grid-template-columns: 1fr;
     }
 
-    .contact-form { padding: 32px 24px; }
+    .donate-panel { padding: 32px 24px; }
 
-    .ribbon-grid { grid-template-columns: 1fr 1fr; }
+    /* Abaixo de 768 o card fica estreito demais para 3 colunas —
+       uma coluna por linha, com ícone e texto lado a lado. */
+    .ribbon-grid { grid-template-columns: 1fr; }
 
     .ribbon-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
         padding: 18px;
     }
 
@@ -2269,13 +2318,6 @@ a {
         grid-template-columns: 1fr;
     }
 
-    .ribbon-grid { grid-template-columns: 1fr; }
-
-    .ribbon-item {
-        flex-direction: row;
-        align-items: center;
-    }
-
     /* 2 colunas em vez de 4 botões empilhados — encurta o caminho até o cardápio. */
     .menu-filters {
         display: grid;
@@ -2331,7 +2373,7 @@ a {
         gap: 12px;
     }
 
-    .contact-form {
+    .donate-panel {
         padding: 26px 18px;
         border-radius: var(--radius-lg);
     }

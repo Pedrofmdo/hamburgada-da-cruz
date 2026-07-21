@@ -415,31 +415,6 @@ if (document.readyState === 'loading') {
     init();
 }
 
-// ===== Contact Form =====
-(function() {
-    var contactForm = document.getElementById('contactForm');
-    if (!contactForm) return;
-
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var name = this.elements['name'] ? this.elements['name'].value.trim() : '';
-        var email = this.elements['email'] ? this.elements['email'].value.trim() : '';
-        var message = this.elements['message'] ? this.elements['message'].value.trim() : '';
-
-        if (!name || !email || !message) {
-            showNotification('Por favor, preencha todos os campos obrigatórios.', 'error');
-            return;
-        }
-        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            showNotification('Por favor, insira um email válido.', 'error');
-            return;
-        }
-        showNotification('Mensagem enviada com sucesso! Entraremos em contato em breve. 🙏', 'success');
-        this.reset();
-    });
-})();
-
 // ===== Notification System =====
 function showNotification(message, type) {
     type = type || 'info';
@@ -468,10 +443,39 @@ function showNotification(message, type) {
         var qr = qrcode(0, 'M');
         qr.addData(DONATE_PIX_PAYLOAD);
         qr.make();
-        el.innerHTML = qr.createImgTag(4, 8, 'QR Code Pix para doação');
+        el.innerHTML = qr.createImgTag(6, 10, 'QR Code Pix para doação');
     } catch (e) {
         el.remove();
     }
+
+    // Botão "Copiar chave" do card de contato.
+    var copyBtn = document.getElementById('donateCopyBtn');
+    var keyEl = document.getElementById('donateKeyText');
+    if (!copyBtn || !keyEl) return;
+
+    copyBtn.addEventListener('click', function() {
+        var key = keyEl.textContent.trim();
+        function done() {
+            showNotification('Chave Pix copiada! 🙏', 'success');
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(key).then(done, fallback);
+        } else {
+            fallback();
+        }
+        // Fallback para navegadores sem clipboard API (ou sem HTTPS).
+        function fallback() {
+            var tmp = document.createElement('textarea');
+            tmp.value = key;
+            tmp.setAttribute('readonly', '');
+            tmp.style.position = 'fixed';
+            tmp.style.opacity = '0';
+            document.body.appendChild(tmp);
+            tmp.select();
+            try { document.execCommand('copy'); done(); } catch (e) {}
+            document.body.removeChild(tmp);
+        }
+    });
 })();
 
 // ===== Footer Year =====

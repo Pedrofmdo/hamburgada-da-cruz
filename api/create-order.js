@@ -38,8 +38,9 @@ module.exports = async (req, res) => {
         const name = String(customer.name || '').trim();
         const phone = String(customer.phone || '').trim();
         const email = String(customer.email || '').trim();
-        const fulfillment = customer.fulfillment === 'delivery' ? 'delivery' : 'pickup';
-        const address = fulfillment === 'delivery' ? sanitizeAddress(customer.address) : null;
+        // Só existe consumo no local: 'dinein' (comer no local) ou 'pickup' (retirar).
+        // Não há entrega, então nenhum endereço é coletado.
+        const fulfillment = customer.fulfillment === 'pickup' ? 'pickup' : 'dinein';
 
         if (name.length < 2) {
             return res.status(400).json({ error: 'Informe seu nome.' });
@@ -49,9 +50,6 @@ module.exports = async (req, res) => {
         }
         if (email && !EMAIL_RE.test(email)) {
             return res.status(400).json({ error: 'E-mail inválido.' });
-        }
-        if (fulfillment === 'delivery' && (!address || !address.street || !address.number || !address.district)) {
-            return res.status(400).json({ error: 'Preencha o endereço de entrega (rua, número e bairro).' });
         }
 
         // ── Recalcula o total no servidor (nunca confia no preço do cliente) ──
@@ -85,11 +83,10 @@ module.exports = async (req, res) => {
 
         // ── Cria o pedido pendente no banco ──
         const itemsJson = JSON.stringify(storedItems);
-        const addressJson = address ? JSON.stringify(address) : null;
 
         const inserted = await sql`
-            INSERT INTO orders (items, customer_name, customer_phone, customer_email, fulfillment, address, total_cents, status)
-            VALUES (${itemsJson}::jsonb, ${name}, ${phone}, ${email || null}, ${fulfillment}, ${addressJson}::jsonb, ${totalCents}, 'pending')
+            INSERT INTO orders (items, customer_name, customer_phone, customer_email, fulfillment, total_cents, status)
+            VALUES (${itemsJson}::jsonb, ${name}, ${phone}, ${email || null}, ${fulfillment}, ${totalCents}, 'pending')
             RETURNING id
         `;
         const orderId = inserted.rows[0].id;
@@ -117,15 +114,3 @@ module.exports = async (req, res) => {
         return res.status(500).json({ error: 'Erro ao criar o pedido. Tente novamente.' });
     }
 };
-
-function sanitizeAddress(addr) {
-    if (!addr || typeof addr !== 'object') return null;
-    const clip = (v) => String(v || '').trim().slice(0, 120);
-    return {
-        street: clip(addr.street),
-        number: clip(addr.number),
-        district: clip(addr.district),
-        complement: clip(addr.complement),
-        reference: clip(addr.reference)
-    };
-}

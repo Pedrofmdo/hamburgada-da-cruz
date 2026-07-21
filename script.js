@@ -614,7 +614,6 @@ function showNotification(message, type) {
     var checkoutForm = document.getElementById('checkoutForm');
     var checkoutTotal = document.getElementById('checkoutTotal');
     var checkoutSubmit = document.getElementById('checkoutSubmit');
-    var deliveryFields = document.getElementById('deliveryFields');
     var stepPix = document.getElementById('cartStepPix');
     var pixQr = document.getElementById('pixQr');
     var pixCode = document.getElementById('pixCode');
@@ -742,17 +741,10 @@ function showNotification(message, type) {
     }
     if (backBtn) backBtn.addEventListener('click', function() { showStep('items'); });
 
-    // Toggle retirada / entrega
-    if (checkoutForm) {
-        checkoutForm.addEventListener('change', function(e) {
-            if (e.target.name !== 'fulfillment') return;
-            var isDelivery = getFulfillment() === 'delivery';
-            if (deliveryFields) deliveryFields.hidden = !isDelivery;
-        });
-    }
+    // Consumir no local / Retirar no local (ambos são no local — não há entrega).
     function getFulfillment() {
         var checked = checkoutForm ? checkoutForm.querySelector('input[name="fulfillment"]:checked') : null;
-        return checked && checked.value === 'delivery' ? 'delivery' : 'pickup';
+        return checked && checked.value === 'pickup' ? 'pickup' : 'dinein';
     }
 
     // ── Submit do checkout ──
@@ -775,8 +767,8 @@ function showNotification(message, type) {
         return null;
     }
 
-    // Monta a mensagem do WhatsApp com o resumo do pedido (itens, total, local de
-    // retirada/endereço de entrega) — pronta pra enviar junto com o comprovante.
+    // Monta a mensagem do WhatsApp com o resumo do pedido (itens, total e se vai
+    // consumir ou retirar no local) — pronta pra enviar junto com o comprovante.
     function buildOrderMessage(cart, customer, totalFormatted) {
         var lines = ['Olá! Acabei de fazer um pedido na Hamburgada da Cruz e já paguei o Pix. Segue o comprovante:', ''];
 
@@ -791,16 +783,9 @@ function showNotification(message, type) {
 
         if (customer) {
             if (customer.name) lines.push('*Nome:* ' + customer.name);
-            if (customer.fulfillment === 'delivery' && customer.address) {
-                var a = customer.address;
-                var addr = [a.street, a.number].filter(Boolean).join(', ');
-                if (a.district) addr += (addr ? ' - ' : '') + a.district;
-                lines.push('*Entrega:* ' + addr);
-                if (a.complement) lines.push('*Complemento:* ' + a.complement);
-                if (a.reference) lines.push('*Referência:* ' + a.reference);
-            } else {
-                lines.push('*Retirada:* no local');
-            }
+            lines.push(customer.fulfillment === 'pickup'
+                ? '*Retirar no local*'
+                : '*Consumir no local*');
         }
 
         return lines.join('\n');
@@ -847,21 +832,6 @@ function showNotification(message, type) {
             if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showNotification('E-mail inválido.', 'error'); return; }
 
             var customer = { name: name, phone: phone, email: email, fulfillment: fulfillment };
-
-            if (fulfillment === 'delivery') {
-                var address = {
-                    street: valueOf('co-street'),
-                    number: valueOf('co-number'),
-                    district: valueOf('co-district'),
-                    complement: valueOf('co-complement'),
-                    reference: valueOf('co-reference')
-                };
-                if (!address.street || !address.number || !address.district) {
-                    showNotification('Preencha rua, número e bairro da entrega.', 'error');
-                    return;
-                }
-                customer.address = address;
-            }
 
             var payload = {
                 items: cart.map(function(l) { return { id: l.id, quantity: l.quantity }; }),

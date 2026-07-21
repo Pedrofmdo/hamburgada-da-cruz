@@ -1872,6 +1872,38 @@ a {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    /* Tablet e celular: foto em cima, informações embaixo. Evita texto
+       espremido sobre a imagem e deixa o título aparecer inteiro. */
+    .bento-item { cursor: default; }
+    .bento-item:hover { transform: none; }
+
+    .bento-item .bento-img {
+        height: clamp(200px, 26vw, 260px);
+    }
+
+    .bento-item .bento-overlay {
+        position: relative;
+        padding: 20px;
+        background: var(--bg-card);
+    }
+
+    .bento-item h3 {
+        display: block;
+        overflow: visible;
+        font-size: 1.2rem;
+        line-height: 1.3;
+    }
+
+    .bento-item .bento-desc {
+        display: block;
+        overflow: visible;
+        margin-bottom: 14px;
+    }
+
+    .bento-item .bento-price {
+        font-size: 1.3rem;
+    }
+
     .instagram-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 16px;
@@ -1904,8 +1936,8 @@ a {
         top: 0;
         right: 0;
         width: min(84vw, 340px);
+        height: 100vh;
         height: 100dvh;
-        min-height: 100vh;
         background: rgba(14, 22, 48, 0.98);
         border-left: 1px solid var(--border-subtle);
         padding: max(92px, calc(72px + env(safe-area-inset-top))) 28px 36px;
@@ -2117,33 +2149,12 @@ a {
         margin-bottom: 36px;
     }
 
-    .bento-item {
-        cursor: default;
-    }
-
-    .bento-item:hover {
-        transform: none;
-    }
-
     .bento-item .bento-img {
         height: clamp(190px, 54vw, 260px);
     }
 
-    .bento-item .bento-overlay {
-        position: relative;
-        padding: 20px;
-        background: var(--bg-card);
-    }
-
-    .bento-item .bento-desc {
-        display: block;
-        overflow: visible;
-        margin-bottom: 14px;
-    }
-
     .bento-item h3 {
         font-size: 1.18rem;
-        line-height: 1.25;
     }
 
     .bento-item .bento-price {
@@ -2265,13 +2276,24 @@ a {
         align-items: center;
     }
 
+    /* 2 colunas em vez de 4 botões empilhados — encurta o caminho até o cardápio. */
     .menu-filters {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
     }
 
     .filter-pill {
         width: 100%;
+        justify-content: center;
+        padding-left: 12px;
+        padding-right: 12px;
+        font-size: 0.84rem;
+    }
+
+    /* Rótulos longos ("Consumir no local") não cabem lado a lado aqui. */
+    .fulfillment-toggle {
+        grid-template-columns: 1fr;
     }
 
     .whatsapp-fab {
@@ -2479,8 +2501,11 @@ a {
     top: 0;
     right: 0;
     width: min(92vw, 420px);
+    /* 100vh como fallback; 100dvh vence nos navegadores modernos.
+       NÃO usar min-height: 100vh aqui — no celular o 100vh inclui a área
+       atrás da barra do navegador e empurraria o rodapé para fora da tela. */
+    height: 100vh;
     height: 100dvh;
-    min-height: 100vh;
     background: var(--bg-surface);
     border-left: 1px solid var(--border-subtle);
     box-shadow: var(--shadow-lg);
@@ -2734,13 +2759,7 @@ a {
     margin-bottom: 22px;
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1.4fr;
-    gap: 16px;
-}
-
-/* Toggle retirada / entrega */
+/* Toggle consumir no local / retirar no local */
 .fulfillment-toggle {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2784,10 +2803,6 @@ a {
 .fulfillment-opt input:focus-visible ~ span {
     outline: 2px solid var(--gold);
     outline-offset: 2px;
-}
-
-.delivery-fields {
-    padding: 4px 0 2px;
 }
 
 .checkout-total {

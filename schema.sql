@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS orders (
     customer_name    TEXT NOT NULL,
     customer_phone   TEXT NOT NULL,
     customer_email   TEXT,
-    fulfillment      TEXT NOT NULL DEFAULT 'pickup',       -- 'pickup' | 'delivery'
-    address          JSONB,                                -- {street, number, district, complement, reference}
+    fulfillment      TEXT NOT NULL DEFAULT 'dinein',       -- 'dinein' (consumir no local) | 'pickup' (retirar no local)
+    address          JSONB,                                -- legado: não há entrega, fica sempre NULL
     total_cents      INTEGER NOT NULL CHECK (total_cents >= 0),
     status           TEXT NOT NULL DEFAULT 'pending',      -- pending | approved | rejected | refunded
     mp_preference_id TEXT,

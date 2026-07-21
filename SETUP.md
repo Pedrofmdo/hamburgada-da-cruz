@@ -77,7 +77,7 @@ O Vercel instala [`@vercel/postgres`](package.json) e publica os arquivos estát
 
 1. Garanta que `PIX_KEY`, `PIX_MERCHANT_NAME`, `PIX_MERCHANT_CITY` e o banco estão configurados.
 2. Faça o deploy (ou use a URL de Preview).
-3. No site: adicione itens → carrinho → **Continuar** → preencha nome/telefone (e endereço se escolher Entrega) → **Gerar Pix do pedido**.
+3. No site: adicione itens → carrinho → **Continuar** → preencha nome/telefone e escolha **Consumir no local** ou **Retirar no local** → **Gerar Pix do pedido**.
 4. Aparece o **QR Code + Copia e Cola** com o valor. Confira no banco que o pedido foi gravado:
    ```sql
    SELECT id, customer_name, total_cents, status, created_at

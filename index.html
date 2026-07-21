@@ -175,7 +175,7 @@
             <div class="section-header" data-reveal>
                 <span class="section-eyebrow">✝ Nosso Cardápio</span>
                 <h2 class="section-title">Sabores<br><span class="gold-text">Consagrados</span></h2>
-                <p class="section-desc">Cada hambúrguer é preparado como uma oferenda — com os melhores ingredientes e
+                <p class="section-desc">Cada hambúrguer é preparado como uma oferta — com os melhores ingredientes e
                     todo o carinho da família.</p>
             </div>
 
@@ -238,7 +238,7 @@
                         do amor e de muitos hambúrgueres deliciosos.
                     </p>
                     <p class="story-text">
-                        A partir disso, nos reunimos todo último domingo do mês para servir à comunidade — vendendo
+                        A partir disso, nos reunimos todo último sábado do mês para servir à comunidade — vendendo
                         hambúrgueres artesanais preparados com ingredientes selecionados e receitas secretas da família.
                         Nossos pães são assados no dia, a carne é escolhida a dedo e cada molho é feito na hora.
                     </p>
@@ -292,7 +292,7 @@
                     <img src="IMGS/familia.jpg" alt="Família Caminho da Cruz" class="instagram-img" loading="lazy">
                     <div class="instagram-overlay">
                         <i class="fab fa-instagram instagram-icon"></i>
-                        <span class="instagram-caption">Nossa família unida no último domingo do mês para servir você.
+                        <span class="instagram-caption">Nossa família unida no último sábado do mês para servir você.
                             ✝</span>
                         <div class="instagram-meta">
                             <span><i class="fas fa-heart"></i> 512</span>
@@ -361,7 +361,7 @@
                     <div class="contact-card">
                         <div class="contact-card-icon"><i class="fas fa-clock"></i></div>
                         <h3>Horário</h3>
-                        <p>Todo último Domingo do mês</p>
+                        <p>Todo último Sábado do mês</p>
                     </div>
                     <div class="contact-card contact-card-pix">
                         <div class="contact-card-icon"><i class="fas fa-heart"></i></div>
@@ -525,45 +525,15 @@
                     <div class="field-line"></div>
                 </div>
 
-                <div class="fulfillment-toggle" role="radiogroup" aria-label="Forma de recebimento">
+                <div class="fulfillment-toggle" role="radiogroup" aria-label="Como você vai consumir">
                     <label class="fulfillment-opt">
-                        <input type="radio" name="fulfillment" value="pickup" checked>
-                        <span><i class="fas fa-store"></i> Retirar no local</span>
+                        <input type="radio" name="fulfillment" value="dinein" checked>
+                        <span><i class="fas fa-utensils"></i> Consumir no local</span>
                     </label>
                     <label class="fulfillment-opt">
-                        <input type="radio" name="fulfillment" value="delivery">
-                        <span><i class="fas fa-motorcycle"></i> Entrega</span>
+                        <input type="radio" name="fulfillment" value="pickup">
+                        <span><i class="fas fa-bag-shopping"></i> Retirar no local</span>
                     </label>
-                </div>
-
-                <div class="delivery-fields" id="deliveryFields" hidden>
-                    <div class="form-field">
-                        <input type="text" id="co-street" name="street" placeholder=" ">
-                        <label for="co-street">Rua / Avenida</label>
-                        <div class="field-line"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-field">
-                            <input type="text" id="co-number" name="number" placeholder=" ">
-                            <label for="co-number">Número</label>
-                            <div class="field-line"></div>
-                        </div>
-                        <div class="form-field">
-                            <input type="text" id="co-district" name="district" placeholder=" ">
-                            <label for="co-district">Bairro</label>
-                            <div class="field-line"></div>
-                        </div>
-                    </div>
-                    <div class="form-field">
-                        <input type="text" id="co-complement" name="complement" placeholder=" ">
-                        <label for="co-complement">Complemento (opcional)</label>
-                        <div class="field-line"></div>
-                    </div>
-                    <div class="form-field">
-                        <input type="text" id="co-reference" name="reference" placeholder=" ">
-                        <label for="co-reference">Ponto de referência (opcional)</label>
-                        <div class="field-line"></div>
-                    </div>
                 </div>
 
                 <div class="checkout-total">
@@ -617,6 +587,11 @@
     <!-- Gerador de QR Code (vendorizado, MIT — kazuhikoarase/qrcode-generator). Sem CDN. -->
     <script src="vendor/qrcode.js"></script>
     <script src="script.js"></script>
+
+    <!-- Vercel Web Analytics (contagem de visitas). O script é servido pelo
+         próprio Vercel; fora dele o 404 é inofensivo. Precisa estar ativado
+         em Project > Analytics no painel do Vercel. -->
+    <script defer src="/_vercel/insights/script.js"></script>
 </body>
 
 </html>

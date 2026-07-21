@@ -112,7 +112,8 @@
     });
 
     window.addEventListener('resize', function() {
-        if (window.innerWidth > 768 && primaryNav.classList.contains('active')) {
+        // 1024 = mesmo breakpoint do CSS onde o menu deixa de ser gaveta.
+        if (window.innerWidth > 1024 && primaryNav.classList.contains('active')) {
             setMenuState(false);
         }
     });

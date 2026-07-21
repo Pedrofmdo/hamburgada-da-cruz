@@ -1960,25 +1960,11 @@ a {
     }
 
     .nav-cta-btn { display: none; }
-}
 
-@media (max-width: 768px) {
-    .container {
-        width: 100%;
-        padding: 0 18px;
-    }
-
-    .header-container {
-        gap: 12px;
-    }
-
+    /* Até 1024px o menu inline não cabe ao lado da logo (a logo e os itens
+       quebravam em duas linhas no tablet) — vira menu de gaveta. */
     .logo a {
-        font-size: 1.05rem;
-        letter-spacing: 0;
-        max-width: calc(100vw - 92px);
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
 
     .primary-nav {
@@ -2033,6 +2019,26 @@ a {
 
     .nav-toggle.active span:nth-child(3) {
         transform: rotate(-45deg) translate(5px, -5px);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding: 0 18px;
+    }
+
+    .header-container {
+        gap: 12px;
+    }
+
+    .logo a {
+        font-size: 1.05rem;
+        letter-spacing: 0;
+        max-width: calc(100vw - 92px);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .hero-section {

@@ -17,10 +17,8 @@ const MENU = {
     7:  { name: 'Guaraná',                                    priceCents: 800 },
     8:  { name: 'Guaraná Zero',                                priceCents: 800 },
     9:  { name: 'Cookie Chocochip',                           priceCents: 1400 },
-    10: { name: 'Cookie Duplochoco',                          priceCents: 1400 },
     11: { name: 'Cookie Nutella',                             priceCents: 1800 },
-    12: { name: 'Cookie Limão Siciliano com Frutas Vermelhas', priceCents: 1800 },
-    13: { name: 'Cookie Red Fruit',                           priceCents: 1800 }
+    12: { name: 'Cookie Limão Siciliano com Frutas Vermelhas', priceCents: 1800 }
 };
 
 function getMenuItem(id) {

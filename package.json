@@ -2,11 +2,14 @@
     "name": "hamburgada-da-cruz",
     "version": "1.0.0",
     "private": true,
-    "description": "Landing page + carrinho e pagamento online (Mercado Pago) da Hamburgada da Cruz.",
+    "description": "Landing page + carrinho, pagamento online (InfinitePay: Pix e cartao) e painel de pedidos da Hamburgada da Cruz.",
     "engines": {
         "node": ">=18"
     },
     "dependencies": {
         "@vercel/postgres": "^0.10.0"
+    },
+    "devDependencies": {
+        "pg": "^8.23.0"
     }
 }

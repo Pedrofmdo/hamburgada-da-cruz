@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Pedido recebido — Hamburgada da Cruz</title>
+    <link rel="icon" type="image/png" href="IMGS/ICON.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #0A1128;
+            --bg-card: #0D1735;
+            --gold: #D4AF37;
+            --green: #2E9E5B;
+            --ember: #C44B2D;
+            --text-primary: #F0EDE6;
+            --text-secondary: rgba(240, 237, 230, 0.70);
+            --text-muted: rgba(240, 237, 230, 0.45);
+            --border-subtle: rgba(212, 175, 55, 0.15);
+            --font-display: 'Cinzel', Georgia, serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 460px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 42px 32px;
+            text-align: center;
+        }
+
+        .icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 22px;
+            font-size: 2rem;
+        }
+        .icon.wait { background: rgba(212, 175, 55, 0.12); color: var(--gold); border: 1px solid var(--border-subtle); }
+        .icon.ok { background: rgba(46, 158, 91, 0.15); color: var(--green); border: 1px solid var(--green); }
+        .icon.err { background: rgba(196, 75, 45, 0.15); color: var(--ember); border: 1px solid var(--ember); }
+
+        .spin { animation: spin 1.4s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        h1 { font-family: var(--font-display); font-size: 1.5rem; color: var(--gold); margin-bottom: 12px; }
+        h1.ok { color: var(--green); }
+
+        p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 10px; }
+        .muted { color: var(--text-muted); font-size: 0.82rem; }
+
+        .total {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin: 20px 0 6px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .method {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 14px;
+            border-radius: 9999px;
+            background: rgba(46, 158, 91, 0.15);
+            color: var(--green);
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
+
+        .btn {
+            display: block;
+            padding: 13px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.88; }
+        .btn-primary { background: var(--gold); color: var(--bg-deep); }
+        .btn-ghost { border: 1px solid var(--border-subtle); color: var(--text-secondary); }
+
+        .order-id { margin-top: 22px; font-size: 0.72rem; color: var(--text-muted); font-family: ui-monospace, monospace; }
+    </style>
+</head>
+
+<body>
+    <main class="card">
+        <div class="icon wait" id="icon"><i class="fas fa-circle-notch spin"></i></div>
+        <h1 id="title">Confirmando seu pagamento…</h1>
+        <p id="msg">Só um instante, estamos verificando com o banco.</p>
+
+        <div class="total" id="total" hidden></div>
+        <div id="method-wrap" hidden><span class="method" id="method"></span></div>
+
+        <div class="actions">
+            <a class="btn btn-primary" href="/">Voltar ao cardápio</a>
+            <a class="btn btn-ghost" id="receipt" href="#" target="_blank" rel="noopener" hidden>
+                <i class="fas fa-receipt"></i> Ver comprovante
+            </a>
+            <a class="btn btn-ghost" href="https://wa.me/558388403579" target="_blank" rel="noopener">
+                <i class="fab fa-whatsapp"></i> Falar no WhatsApp
+            </a>
+        </div>
+
+        <div class="order-id" id="order-id"></div>
+    </main>
+
+    <script>
+        (function () {
+            'use strict';
+
+            var CART_KEY = 'hdc_cart';
+            var MAX_TRIES = 12;   // ~36s: o webhook costuma chegar em segundos
+            var INTERVAL_MS = 3000;
+
+            var iconEl = document.getElementById('icon');
+            var titleEl = document.getElementById('title');
+            var msgEl = document.getElementById('msg');
+            var totalEl = document.getElementById('total');
+            var methodWrap = document.getElementById('method-wrap');
+            var methodEl = document.getElementById('method');
+            var receiptEl = document.getElementById('receipt');
+            var orderIdEl = document.getElementById('order-id');
+
+            var params = new URLSearchParams(window.location.search);
+            var orderId = params.get('pedido');
+            var tries = 0;
+
+            if (orderId) {
+                orderIdEl.textContent = 'Pedido #' + orderId.slice(0, 8);
+            }
+
+            function setState(kind, icon, title, message) {
+                iconEl.className = 'icon ' + kind;
+                iconEl.innerHTML = '<i class="' + icon + '"></i>';
+                titleEl.textContent = title;
+                titleEl.className = kind === 'ok' ? 'ok' : '';
+                msgEl.textContent = message;
+            }
+
+            function clearCart() {
+                try { localStorage.removeItem(CART_KEY); } catch (e) {}
+            }
+
+            function onPaid(data) {
+                clearCart(); // pagou: o carrinho cumpriu seu papel
+                setState('ok', 'fas fa-check',
+                    'Pagamento confirmado!',
+                    'Seu pedido já está com a gente. É só chegar e retirar.');
+
+                if (data.total_formatted) {
+                    totalEl.textContent = data.total_formatted;
+                    totalEl.hidden = false;
+                }
+                if (data.payment_method) {
+                    var pix = data.payment_method === 'pix';
+                    methodEl.innerHTML = '<i class="fas ' + (pix ? 'fa-bolt' : 'fa-credit-card') + '"></i> ' +
+                        (pix ? 'Pago com Pix' : 'Pago no cartão');
+                    methodWrap.hidden = false;
+                }
+                if (data.receipt_url) {
+                    receiptEl.href = data.receipt_url;
+                    receiptEl.hidden = false;
+                }
+            }
+
+            function onStillWaiting() {
+                // Não é erro: o webhook pode demorar alguns segundos.
+                // O pedido continua valendo, então nunca dizemos "falhou".
+                setState('wait', 'far fa-clock',
+                    'Recebemos seu pedido',
+                    'A confirmação do pagamento pode levar alguns instantes. ' +
+                    'Se já pagou, está tudo certo — pode chegar e retirar.');
+            }
+
+            function poll() {
+                fetch('/api/order-status?id=' + encodeURIComponent(orderId))
+                    .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+                    .then(function (res) {
+                        if (!res.ok) throw new Error(res.d && res.d.error);
+
+                        if (res.d.paid) { onPaid(res.d); return; }
+
+                        if (res.d.status === 'rejected') {
+                            setState('err', 'fas fa-xmark',
+                                'Pagamento não concluído',
+                                'O pagamento não foi finalizado. Você pode tentar de novo pelo cardápio.');
+                            return;
+                        }
+
+                        tries++;
+                        if (tries >= MAX_TRIES) { onStillWaiting(); return; }
+                        setTimeout(poll, INTERVAL_MS);
+                    })
+                    .catch(function () {
+                        // Falha de rede não deve assustar quem já pagou.
+                        onStillWaiting();
+                    });
+            }
+
+            if (!orderId) {
+                setState('wait', 'fas fa-utensils',
+                    'Obrigado!',
+                    'Qualquer dúvida sobre o seu pedido, é só chamar no WhatsApp.');
+            } else {
+                poll();
+            }
+        })();
+    </script>
+</body>
+
+</html>

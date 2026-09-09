@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Painel de Pedidos — Hamburgada da Cruz</title>
+    <link rel="icon" type="image/png" href="IMGS/ICON.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #0A1128;
+            --bg-card: #0D1735;
+            --bg-elevated: #16224F;
+            --gold: #D4AF37;
+            --gold-dark: #AA7C11;
+            --ember: #C44B2D;
+            --green: #2E9E5B;
+            --green-glow: rgba(46, 158, 91, 0.18);
+            --text-primary: #F0EDE6;
+            --text-secondary: rgba(240, 237, 230, 0.70);
+            --text-muted: rgba(240, 237, 230, 0.45);
+            --border-subtle: rgba(212, 175, 55, 0.15);
+            --border-glow: rgba(212, 175, 55, 0.35);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --font-display: 'Cinzel', Georgia, serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrap { max-width: 1100px; margin: 0 auto; }
+
+        /* ===== Login ===== */
+        .login {
+            max-width: 380px;
+            margin: 12vh auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 36px 30px;
+            text-align: center;
+        }
+        .login h1 { font-family: var(--font-display); color: var(--gold); font-size: 1.4rem; margin-bottom: 6px; }
+        .login p { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 22px; }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 13px 15px;
+            background: var(--bg-deep);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            margin-bottom: 14px;
+        }
+        input[type="password"]:focus { outline: 2px solid var(--gold); outline-offset: 1px; border-color: transparent; }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            background: var(--gold);
+            color: var(--bg-deep);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #E5A93C; }
+        .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+        .error { color: var(--ember); font-size: 0.85rem; margin-top: 12px; min-height: 1.1em; }
+
+        /* ===== Cabeçalho ===== */
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding-bottom: 18px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        header h1 { font-family: var(--font-display); color: var(--gold); font-size: 1.35rem; }
+        .live { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; color: var(--text-muted); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* ===== Resumo ===== */
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+        }
+        .stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .stat-value.gold { color: var(--gold); }
+        .stat-value.green { color: var(--green); }
+
+        /* ===== Filtros ===== */
+        .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .chip {
+            padding: 8px 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 9999px;
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .chip:hover { border-color: var(--border-glow); }
+        .chip[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--bg-deep); font-weight: 600; }
+        .sep { width: 1px; background: var(--border-subtle); margin: 4px 6px; }
+
+        /* ===== Pedidos ===== */
+        .order {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-left: 3px solid var(--text-muted);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            margin-bottom: 12px;
+        }
+        .order.paid { border-left-color: var(--green); background: linear-gradient(90deg, var(--green-glow), var(--bg-card) 22%); }
+        .order.pending { border-left-color: var(--gold-dark); }
+        .order.flash { animation: flash 1.6s ease-out 3; }
+        @keyframes flash { 0%, 100% { box-shadow: none; } 50% { box-shadow: 0 0 0 3px var(--green); } }
+
+        .order-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+        .order-who { font-weight: 600; font-size: 1.05rem; }
+        .order-meta { font-size: 0.78rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge.paid { background: var(--green); color: #fff; }
+        .badge.pending { background: rgba(212, 175, 55, 0.18); color: var(--gold); border: 1px solid var(--border-glow); }
+        .badge.other { background: rgba(196, 75, 45, 0.18); color: var(--ember); }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            background: var(--bg-elevated);
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        .items { list-style: none; margin: 12px 0; }
+        .items li {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 7px 0;
+            border-bottom: 1px dashed var(--border-subtle);
+            font-size: 0.9rem;
+        }
+        .items li:last-child { border-bottom: none; }
+        .qty { color: var(--gold); font-weight: 700; margin-right: 8px; font-variant-numeric: tabular-nums; }
+        .line-price { color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+        .order-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+        .total { font-size: 1.2rem; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; }
+        .paid-extra { display: block; font-size: 0.72rem; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
+        .contact { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.84rem; }
+        .contact a { color: var(--text-secondary); text-decoration: none; }
+        .contact a:hover { color: var(--gold); text-decoration: underline; }
+
+        .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty i { font-size: 2.2rem; color: var(--gold-dark); margin-bottom: 14px; display: block; }
+
+        .foot { text-align: center; color: var(--text-muted); font-size: 0.75rem; margin-top: 26px; }
+        .foot button { background: none; border: none; color: var(--text-muted); text-decoration: underline; cursor: pointer; font-family: var(--font-body); font-size: 0.75rem; }
+
+        @media (max-width: 600px) {
+            body { padding: 14px; }
+            .stat-value { font-size: 1.25rem; }
+            .order { padding: 15px 16px; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== Tela de senha ===== -->
+    <div class="login" id="login">
+        <h1>Painel de Pedidos</h1>
+        <p>Hamburgada da Cruz</p>
+        <form id="login-form">
+            <input type="password" id="pwd" placeholder="Senha do painel" autocomplete="current-password" required>
+            <button class="btn" type="submit" id="login-btn">Entrar</button>
+        </form>
+        <div class="error" id="login-error" role="alert"></div>
+    </div>
+
+    <!-- ===== Painel ===== -->
+    <div class="wrap" id="panel" hidden>
+        <header>
+            <h1><i class="fas fa-receipt"></i> Pedidos</h1>
+            <div class="live"><span class="dot"></span> <span>atualizando a cada 20s</span></div>
+        </header>
+
+        <div class="summary" id="summary"></div>
+
+        <div class="filters">
+            <button class="chip" data-range="today" aria-pressed="true">Hoje</button>
+            <button class="chip" data-range="7d" aria-pressed="false">7 dias</button>
+            <button class="chip" data-range="all" aria-pressed="false">Tudo</button>
+            <div class="sep"></div>
+            <button class="chip" data-status="all" aria-pressed="true">Todos</button>
+            <button class="chip" data-status="paid" aria-pressed="false">Pagos</button>
+            <button class="chip" data-status="pending" aria-pressed="false">Aguardando</button>
+        </div>
+
+        <div id="orders"></div>
+
+        <div class="foot">
+            Atualizado às <span id="updated">—</span> ·
+            <button type="button" id="logout">sair</button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            var POLL_MS = 20000;
+            var KEY = 'hdc_admin_pwd';
+
+            var loginEl = document.getElementById('login');
+            var panelEl = document.getElementById('panel');
+            var formEl = document.getElementById('login-form');
+            var pwdEl = document.getElementById('pwd');
+            var loginBtn = document.getElementById('login-btn');
+            var loginErr = document.getElementById('login-error');
+            var ordersEl = document.getElementById('orders');
+            var summaryEl = document.getElementById('summary');
+            var updatedEl = document.getElementById('updated');
+
+            var password = '';
+            var range = 'today';
+            var status = 'all';
+            var timer = null;
+            var knownPaid = null; // null = ainda não carregou a 1ª vez
+
+            // ── Helpers ──
+            function brl(cents) {
+                return 'R$ ' + (cents / 100).toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2, maximumFractionDigits: 2
+                });
+            }
+            function timeOf(iso) {
+                var d = new Date(iso);
+                var hoje = new Date().toDateString() === d.toDateString();
+                var hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                return hoje ? hora : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + hora;
+            }
+            // Todo dado vindo do banco passa por aqui antes de virar HTML.
+            function esc(s) {
+                return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+                });
+            }
+            function onlyDigits(s) { return String(s || '').replace(/\D/g, ''); }
+
+            // Bipe curto pra cozinha perceber pedido pago sem olhar a tela.
+            function beep() {
+                try {
+                    var Ctx = window.AudioContext || window.webkitAudioContext;
+                    if (!Ctx) return;
+                    var ctx = new Ctx();
+                    var osc = ctx.createOscillator();
+                    var gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, ctx.currentTime);
+                    osc.frequency.setValueAtTime(1320, ctx.currentTime + 0.12);
+                    gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.45);
+                } catch (e) { /* som é enfeite, nunca quebra o painel */ }
+            }
+
+            // ── Render ──
+            function renderSummary(s) {
+                summaryEl.innerHTML =
+                    '<div class="stat"><div class="stat-label">Faturamento pago</div>' +
+                    '<div class="stat-value green">' + brl(s.revenue_cents) + '</div></div>' +
+                    '<div class="stat"><div class="stat-label">Pedidos pagos</div>' +
+                    '<div class="stat-value green">' + s.paid_orders + '</div></div>' +
+                    '<div class="stat"><div class="stat-label">Aguardando pagamento</div>' +
+                    '<div class="stat-value gold">' + s.pending_orders + '</div></div>' +
+                    '<div class="stat"><div class="stat-label">Total de pedidos</div>' +
+                    '<div class="stat-value">' + s.total_orders + '</div></div>';
+            }
+
+            function badgeFor(o) {
+                if (o.status === 'approved') {
+                    // Mostra COMO foi pago: muda a conferência no fim do dia.
+                    var pix = o.payment_method === 'pix';
+                    var how = o.payment_method
+                        ? ' ' + (pix ? 'Pix' : 'Cartão' + (o.installments > 1 ? ' ' + o.installments + 'x' : ''))
+                        : '';
+                    return '<span class="badge paid"><i class="fas ' +
+                        (pix ? 'fa-bolt' : o.payment_method ? 'fa-credit-card' : 'fa-check') +
+                        '"></i> Pago' + esc(how) + '</span>';
+                }
+                if (o.status === 'pending') return '<span class="badge pending"><i class="far fa-clock"></i> Aguardando</span>';
+                if (o.status === 'rejected') return '<span class="badge other"><i class="fas fa-xmark"></i> Não concluído</span>';
+                return '<span class="badge other">' + esc(o.status) + '</span>';
+            }
+
+            // Com repasse de taxas o cliente paga mais que o total do pedido.
+            // Mostrar a diferença evita pânico na hora de bater o caixa.
+            function extraPago(o) {
+                if (!o.paid_amount_cents || o.paid_amount_cents <= o.total_cents) return '';
+                var dif = o.paid_amount_cents - o.total_cents;
+                return '<span class="paid-extra">cliente pagou ' + brl(o.paid_amount_cents) +
+                    ' (+' + brl(dif) + ' de taxa)</span>';
+            }
+
+            function comprovante(o) {
+                if (!o.receipt_url) return '';
+                return '<a href="' + esc(o.receipt_url) + '" target="_blank" rel="noopener">' +
+                    '<i class="fas fa-receipt"></i> Comprovante</a>';
+            }
+
+            function renderOrders(orders, isFirstLoad) {
+                if (!orders.length) {
+                    ordersEl.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i>' +
+                        'Nenhum pedido neste filtro.</div>';
+                    return;
+                }
+
+                var novos = [];
+                var html = orders.map(function (o) {
+                    var paid = o.status === 'approved';
+                    if (paid && !isFirstLoad && !knownPaid.has(o.id)) novos.push(o.id);
+                    if (paid) knownPaid.add(o.id);
+
+                    var items = (o.items || []).map(function (it) {
+                        var lineTotal = (it.unit_price_cents || 0) * (it.quantity || 0);
+                        return '<li><span><span class="qty">' + esc(it.quantity) + '×</span>' +
+                            esc(it.name) + '</span><span class="line-price">' + brl(lineTotal) + '</span></li>';
+                    }).join('');
+
+                    var local = o.fulfillment === 'pickup'
+                        ? '<span class="tag"><i class="fas fa-bag-shopping"></i> Retirar no local</span>'
+                        : '<span class="tag"><i class="fas fa-chair"></i> Consumir no local</span>';
+
+                    var zap = onlyDigits(o.customer_phone);
+                    var contato = '<a href="https://wa.me/55' + esc(zap) + '" target="_blank" rel="noopener">' +
+                        '<i class="fab fa-whatsapp"></i> ' + esc(o.customer_phone) + '</a>';
+                    if (o.customer_email) {
+                        contato += '<a href="mailto:' + esc(o.customer_email) + '">' +
+                            '<i class="far fa-envelope"></i> ' + esc(o.customer_email) + '</a>';
+                    }
+
+                    return '<article class="order ' + (paid ? 'paid' : 'pending') + '" data-id="' + esc(o.id) + '">' +
+                        '<div class="order-top">' +
+                        '<div><div class="order-who">' + esc(o.customer_name) + '</div>' +
+                        '<div class="order-meta">#' + esc(o.short_id) + ' · ' + esc(timeOf(o.created_at)) + '</div></div>' +
+                        badgeFor(o) + '</div>' +
+                        local +
+                        '<ul class="items">' + items + '</ul>' +
+                        '<div class="order-bottom">' +
+                        '<div class="total">' + brl(o.total_cents) + extraPago(o) + '</div>' +
+                        '<div class="contact">' + contato + comprovante(o) + '</div>' +
+                        '</div></article>';
+                }).join('');
+
+                ordersEl.innerHTML = html;
+
+                // Destaca e avisa os que acabaram de ser pagos.
+                if (novos.length) {
+                    beep();
+                    novos.forEach(function (id) {
+                        var el = ordersEl.querySelector('[data-id="' + id + '"]');
+                        if (el) el.classList.add('flash');
+                    });
+                }
+            }
+
+            // ── Dados ──
+            function load() {
+                var url = '/api/admin-orders?range=' + encodeURIComponent(range) +
+                    '&status=' + encodeURIComponent(status);
+
+                return fetch(url, { headers: { 'x-admin-password': password } })
+                    .then(function (r) {
+                        if (r.status === 401) throw new Error('unauthorized');
+                        return r.json().then(function (d) {
+                            if (!r.ok) throw new Error(d.error || 'Erro ao carregar.');
+                            return d;
+                        });
+                    })
+                    .then(function (d) {
+                        var isFirstLoad = knownPaid === null;
+                        if (isFirstLoad) knownPaid = new Set();
+                        renderSummary(d.summary);
+                        renderOrders(d.orders, isFirstLoad);
+                        updatedEl.textContent = new Date().toLocaleTimeString('pt-BR');
+                    });
+            }
+
+            function startPolling() {
+                stopPolling();
+                timer = setInterval(function () {
+                    // Aba escondida não precisa consultar o banco.
+                    if (document.hidden) return;
+                    load().catch(function (e) {
+                        if (e.message === 'unauthorized') logout('Sessão expirada.');
+                    });
+                }, POLL_MS);
+            }
+            function stopPolling() { if (timer) { clearInterval(timer); timer = null; } }
+
+            // ── Sessão ──
+            function enter(pwd) {
+                password = pwd;
+                loginEl.hidden = true;
+                panelEl.hidden = false;
+                knownPaid = null;
+                load()
+                    .then(startPolling)
+                    .catch(function (e) {
+                        if (e.message === 'unauthorized') { logout('Senha inválida.'); }
+                        else { ordersEl.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; }
+                    });
+            }
+
+            function logout(msg) {
+                stopPolling();
+                password = '';
+                knownPaid = null;
+                try { sessionStorage.removeItem(KEY); } catch (e) {}
+                panelEl.hidden = true;
+                loginEl.hidden = false;
+                loginErr.textContent = msg || '';
+                pwdEl.value = '';
+            }
+
+            formEl.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var pwd = pwdEl.value;
+                if (!pwd) return;
+                loginBtn.disabled = true;
+                loginErr.textContent = '';
+
+                password = pwd;
+                knownPaid = null;
+                load()
+                    .then(function () {
+                        // Só guarda depois que o servidor aceitou.
+                        try { sessionStorage.setItem(KEY, pwd); } catch (e2) {}
+                        loginEl.hidden = true;
+                        panelEl.hidden = false;
+                        startPolling();
+                    })
+                    .catch(function (err) {
+                        password = '';
+                        loginErr.textContent = err.message === 'unauthorized'
+                            ? 'Senha inválida.' : err.message;
+                    })
+                    .then(function () { loginBtn.disabled = false; });
+            });
+
+            document.getElementById('logout').addEventListener('click', function () { logout(); });
+
+            document.querySelectorAll('.chip').forEach(function (chip) {
+                chip.addEventListener('click', function () {
+                    var group = chip.dataset.range ? 'range' : 'status';
+                    var value = chip.dataset.range || chip.dataset.status;
+                    document.querySelectorAll('.chip[data-' + group + ']').forEach(function (c) {
+                        c.setAttribute('aria-pressed', String(c === chip));
+                    });
+                    if (group === 'range') { range = value; } else { status = value; }
+                    load().catch(function (e) { if (e.message === 'unauthorized') logout('Sessão expirada.'); });
+                });
+            });
+
+            // Voltou pra aba: atualiza na hora em vez de esperar o ciclo.
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden && password) {
+                    load().catch(function (e) { if (e.message === 'unauthorized') logout('Sessão expirada.'); });
+                }
+            });
+
+            // Sessão ainda válida nesta aba?
+            var saved = null;
+            try { saved = sessionStorage.getItem(KEY); } catch (e) {}
+            if (saved) { enter(saved); }
+        })();
+    </script>
+</body>
+
+</html>

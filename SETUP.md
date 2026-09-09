@@ -92,9 +92,141 @@ O Vercel instala [`@vercel/postgres`](package.json) e publica os arquivos estát
 
 ---
 
+## 7. Painel de pedidos (`/admin.html`)
+
+Painel interno para acompanhar os pedidos. Mostra faturamento pago do periodo,
+itens, cliente, telefone (link direto no WhatsApp), consumir/retirar e o status
+de pagamento. Atualiza sozinho a cada 20s e da um bipe quando um pedido novo e pago.
+
+**Acesso:** `https://seusite.com/admin.html`
+
+**Configurar a senha:**
+
+```bash
+# gere uma senha forte
+openssl rand -base64 24
+
+# local: coloque no .env
+ADMIN_PASSWORD=a_senha_gerada
+
+# producao: Vercel > Settings > Environment Variables
+```
+
+A senha tem **minimo de 8 caracteres**. Se `ADMIN_PASSWORD` estiver vazia ou
+curta demais, o painel devolve 500 e nao abre — nunca vira "entra todo mundo".
+
+**Filtros:** Hoje / 7 dias / Tudo, cruzados com Todos / Pagos / Aguardando.
+
+> **Atencao — enquanto o pagamento for Pix estatico, o status nunca vira `PAGO`
+> sozinho.** O Pix estatico nao tem confirmacao: o dinheiro cai direto na chave
+> e o banco nao avisa o sistema. Todo pedido fica `Aguardando`. A confirmacao
+> automatica so passa a funcionar com o checkout da InfinitePay e o webhook.
+
+---
+
+## 8. InfinitePay — Checkout Integrado
+
+O pagamento passou do **Pix estatico** para o **Checkout Integrado da InfinitePay**.
+Motivo: o Pix estatico nao tinha confirmacao nenhuma (o banco nao avisa o sistema),
+entao nenhum pedido conseguia virar `PAGO` sozinho. Pela InfinitePay o Pix continua
+**0%** e passa a confirmar automaticamente, e o cartao entra junto.
+
+### Fluxo
+
+```
+Cliente finaliza o pedido
+  -> api/create-order.js       recalcula o total no servidor, grava 'pending',
+                               pede o link a InfinitePay, devolve checkout_url
+  -> cliente e redirecionado   paga com Pix ou cartao no checkout da InfinitePay
+  -> api/infinitepay-webhook   confirma no /payment_check e marca 'approved'
+  -> obrigado.html             consulta /api/order-status e mostra o resultado
+  -> admin.html                mostra PAGO, com metodo e comprovante
+```
+
+### Configurar
+
+1. **App InfinitePay** > Vendas > Checkout > Configuracoes > **Habilitar Checkout Integrado**
+2. **Ligar o repasse de taxas** no app (Link de Pagamento > repasse). Sem isso a
+   hamburgada absorve ate 16,66% num parcelamento em 12x. A API **nao permite
+   limitar o numero de parcelas** — o repasse e o que protege a margem.
+3. Variaveis de ambiente:
+
+```
+INFINITEPAY_HANDLE=pedro-jorge-2d8      # InfiniteTag SEM o "$"
+PUBLIC_BASE_URL=https://seusite.com     # sem barra no final
+```
+
+4. Rodar a migracao do banco: [`migrations/001_infinitepay.sql`](migrations/001_infinitepay.sql)
+
+### Autenticacao
+
+**Nao precisa.** Testado contra a API real: o endpoint `/links` identifica a conta
+so pelo `handle`. Nao ha OAuth nem Bearer token neste fluxo. (Existe uma API de
+e-commerce separada em `api.infinitepay.io/v2` que usa OAuth, mas nao e necessaria
+para o Checkout Integrado.)
+
+### Armadilha do payment_check
+
+`POST /payment_check` responde **HTTP 200 mesmo quando NAO houve pagamento** —
+devolve `{"success": false}` com status 200. Nunca use `res.ok` como prova de
+pagamento. O codigo checa `success === true && paid === true`
+(ver [`api/_infinitepay.js`](api/_infinitepay.js)).
+
+### Por que o webhook nao e confiavel sozinho
+
+A InfinitePay **nao assina** o webhook (sem HMAC, sem segredo). Quem descobrisse a
+URL poderia postar "pago" e liberar pedido de graca. Por isso
+[`api/infinitepay-webhook.js`](api/infinitepay-webhook.js) usa o corpo recebido
+apenas para saber **qual** pedido conferir, e a decisao vem do `/payment_check` +
+comparacao com o total gravado no nosso banco.
+
+### Sobre valores
+
+Com repasse de taxas o cliente paga **mais** que o total do pedido
+(`paid_amount` > `amount`). O webhook aprova quando o pago **cobre** o total, e o
+painel mostra a diferenca para nao confundir na hora de bater o caixa.
+
+---
+
+## 9. Rodar local (sem Vercel CLI)
+
+```bash
+npm install
+node dev-server.js          # http://localhost:3000
+```
+
+O [`dev-server.js`](dev-server.js) reproduz o que a Vercel faz: serve os arquivos
+estaticos e roteia `/api/*` para os handlers em `api/`. Sem dependencias, sem CLI
+e sem conta. Ele le o `.env` sozinho e recarrega os handlers a cada request
+(editou, e so dar F5).
+
+Precisa de um `POSTGRES_URL` valido no `.env` — qualquer Postgres serve
+(Neon free, Supabase, ou um local).
+
+### O webhook nao chega em localhost
+
+A InfinitePay precisa de uma URL publica para confirmar o pagamento. Em
+`localhost` o link e gerado e da pra pagar, mas o pedido nunca vira `PAGO`.
+
+Para testar a confirmacao ponta a ponta, exponha o servidor local:
+
+```bash
+# tunel sem cadastro
+cloudflared tunnel --url http://localhost:3000
+
+# no .env, aponte para a URL que ele imprimir:
+PUBLIC_BASE_URL=https://algo-aleatorio.trycloudflare.com
+```
+
+Reinicie o `dev-server.js` depois de mudar o `.env`.
+
+---
+
 ## Segurança (mantida)
 - [x] Preço **sempre** recalculado no servidor ([`api/create-order.js`](api/create-order.js)); o cliente manda só `id`+`quantidade`.
 - [x] O valor do Pix é o total calculado no servidor — o navegador não influencia o valor cobrado.
+- [x] Painel protegido por senha comparada em **tempo constante** (`api/_auth.js`), para nao vazar a senha caractere a caractere pelo tempo de resposta.
+- [x] Painel envia `Cache-Control: no-store` — nenhum dado de pedido fica em cache de CDN ou navegador.
 - [x] Nenhum segredo no front. A `PIX_KEY` fica só no servidor (e, de qualquer forma, uma chave Pix não é secreta — serve para receber).
 
 ---
@@ -104,12 +236,21 @@ O Vercel instala [`@vercel/postgres`](package.json) e publica os arquivos estát
 | Arquivo | Papel |
 |---|---|
 | [`api/_menu.js`](api/_menu.js) | Tabela de preços confiável (fonte de verdade, em centavos) |
-| [`api/_pix.js`](api/_pix.js) | Monta o BR Code / Copia e Cola do Pix (TLV + CRC16), sem rede |
-| [`api/create-order.js`](api/create-order.js) | Recalcula total, grava pedido, retorna `pix_payload` |
-| [`vendor/qrcode.js`](vendor/qrcode.js) | Gerador de QR local (MIT, kazuhikoarase) — sem CDN |
+| [`api/_pix.js`](api/_pix.js) | **LEGADO** — Pix estatico, fora do fluxo desde a migracao para a InfinitePay |
+| [`api/create-order.js`](api/create-order.js) | Recalcula total, grava pedido, retorna `checkout_url` |
+| [`vendor/qrcode.js`](vendor/qrcode.js) | **LEGADO** — so era usado pela tela do Pix estatico |
 | [`schema.sql`](schema.sql) | Tabela `orders` |
 | [`package.json`](package.json) | Dependência do backend (`@vercel/postgres`) |
 | [`.env.example`](.env.example) | Documentação das variáveis |
+| [`api/_infinitepay.js`](api/_infinitepay.js) | Cliente do Checkout Integrado (cria link, confere pagamento) |
+| [`api/infinitepay-webhook.js`](api/infinitepay-webhook.js) | Recebe a notificacao, confirma na fonte e aprova o pedido |
+| [`api/order-status.js`](api/order-status.js) | Status publico e minimo de um pedido (usado pelo obrigado.html) |
+| [`obrigado.html`](obrigado.html) | Pagina de retorno do checkout |
+| [`migrations/001_infinitepay.sql`](migrations/001_infinitepay.sql) | Colunas de pagamento; remove sobras do Mercado Pago |
+| [`dev-server.js`](dev-server.js) | Servidor local que imita a Vercel (so para desenvolvimento) |
+| [`admin.html`](admin.html) | Painel de pedidos (login, filtros, auto-refresh) |
+| [`api/admin-orders.js`](api/admin-orders.js) | Lista os pedidos para o painel (protegido por senha) |
+| [`api/_auth.js`](api/_auth.js) | Checagem da senha do painel, em tempo constante |
 | `index.html` / `script.js` / `style.css` | Carrinho, drawer, checkout e tela do Pix |
 
 > O WhatsApp (FAB e botões) foi **mantido** — agora também é o canal de envio de comprovante.

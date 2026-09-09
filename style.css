@@ -2775,6 +2775,40 @@ a {
     color: var(--gold);
 }
 
+/* Formas de pagamento aceitas — o cliente precisa saber que
+   existe cartão ANTES de decidir continuar. */
+.pay-methods {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.pay-methods-center {
+    justify-content: center;
+    margin-top: 14px;
+    margin-bottom: 0;
+}
+
+.pay-method {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    background: var(--glass-bg);
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.pay-method i {
+    color: var(--gold);
+    font-size: 0.82rem;
+}
+
 .cart-note-center {
     justify-content: center;
     text-align: center;

@@ -837,14 +837,14 @@ function showNotification(message, type) {
                     return r.json().then(function(data) { return { ok: r.ok, data: data }; });
                 })
                 .then(function(res) {
-                    if (!res.ok || !res.data || !res.data.pix_payload) {
+                    if (!res.ok || !res.data || !res.data.checkout_url) {
                         throw new Error((res.data && res.data.error) || 'Não foi possível gerar o pagamento.');
                     }
-                    // Mostra o Pix (QR + Copia e Cola) gerado no servidor.
-                    // Passa cart/customer ANTES de limpar, pra montar a mensagem do WhatsApp.
-                    showPix(res.data.pix_payload, res.data.total_formatted, cart, customer);
-                    clearCart(); // pedido já registrado no servidor
-                    setLoading(false);
+                    // Vai para o checkout da InfinitePay (Pix ou cartão).
+                    // O carrinho NÃO é limpo aqui: se o cliente desistir e
+                    // voltar, o pedido dele ainda está lá. Quem limpa é a
+                    // página de retorno (obrigado.html), após o pagamento.
+                    window.location.href = res.data.checkout_url;
                 })
                 .catch(function(err) {
                     showNotification(err.message || 'Erro ao processar o pedido. Tente novamente.', 'error');

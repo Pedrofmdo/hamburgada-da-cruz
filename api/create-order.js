@@ -5,17 +5,32 @@
 //  Recebe { items: [{id, quantity}], customer: {...} }.
 //  - Recalcula o total no servidor (ignora qualquer preço do cliente).
 //  - Cria o pedido no Postgres com status "pending".
-//  - Gera o Pix estático (BR Code Copia e Cola) com o valor EXATO —
-//    sem chamar nenhuma API externa.
-//  - Devolve { order_id, pix_payload, total_formatted } para o front
-//    renderizar o QR Code e o Copia e Cola.
+//  - Gera o link do Checkout Integrado da InfinitePay (Pix ou cartão).
+//  - Devolve { order_id, checkout_url, total_formatted } para o front
+//    redirecionar o cliente.
+//
+//  A confirmação do pagamento NÃO acontece aqui: chega depois em
+//  api/infinitepay-webhook.js, que é quem marca o pedido como pago.
 // ─────────────────────────────────────────────────────────────
 const { sql } = require('@vercel/postgres');
 const { getMenuItem } = require('./_menu');
-const { buildPixPayload } = require('./_pix');
+const { createPaymentLink } = require('./_infinitepay');
 
 const MAX_QTY_PER_ITEM = 50;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// A InfinitePay precisa de URLs absolutas para redirect e webhook.
+// PUBLIC_BASE_URL manda; sem ela, deduz do próprio request (a Vercel
+// preenche x-forwarded-host nos previews e em produção).
+function baseUrlFrom(req) {
+    const configured = String(process.env.PUBLIC_BASE_URL || '').trim().replace(/\/+$/, '');
+    if (configured) return configured;
+
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    if (!host) return null;
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+    return proto + '://' + host;
+}
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {
@@ -23,9 +38,8 @@ module.exports = async (req, res) => {
         return res.status(405).json({ error: 'Método não permitido.' });
     }
 
-    const pixKey = process.env.PIX_KEY;
-    if (!pixKey) {
-        console.error('PIX_KEY não configurada.');
+    if (!process.env.INFINITEPAY_HANDLE) {
+        console.error('INFINITEPAY_HANDLE não configurada.');
         return res.status(500).json({ error: 'Pagamento indisponível no momento.' });
     }
 
@@ -91,22 +105,34 @@ module.exports = async (req, res) => {
         `;
         const orderId = inserted.rows[0].id;
 
-        // ── Gera o Pix estático (sem API externa) ──
-        // txid: primeiros 25 caracteres alfanuméricos do id do pedido (sem hífen).
-        const txid = String(orderId).replace(/[^A-Za-z0-9]/g, '').slice(0, 25);
-        const pixPayload = buildPixPayload({
-            key: pixKey,
-            merchantName: process.env.PIX_MERCHANT_NAME || 'HAMBURGADA DA CRUZ',
-            merchantCity: process.env.PIX_MERCHANT_CITY || 'JOAO PESSOA',
-            amountCents: totalCents,
-            txid: txid
-        });
+        // ── Gera o link do checkout (Pix ou cartão) ──
+        // order_nsu = id do pedido, é como o webhook nos encontra depois.
+        const base = baseUrlFrom(req);
+        let checkoutUrl;
+
+        try {
+            checkoutUrl = await createPaymentLink({
+                orderId: orderId,
+                items: storedItems,
+                customer: { name: name, email: email, phone: phone },
+                redirectUrl: base ? base + '/obrigado.html?pedido=' + encodeURIComponent(orderId) : undefined,
+                webhookUrl: base ? base + '/api/infinitepay-webhook' : undefined
+            });
+        } catch (err) {
+            // O pedido já está no banco; marca como rejeitado para não
+            // ficar "aguardando pagamento" para sempre no painel.
+            console.error('Falha ao criar link na InfinitePay:', err);
+            await sql`UPDATE orders SET status = 'rejected', updated_at = now() WHERE id = ${orderId}::uuid`;
+            return res.status(502).json({ error: 'Não foi possível iniciar o pagamento. Tente novamente.' });
+        }
+
+        await sql`UPDATE orders SET checkout_url = ${checkoutUrl}, updated_at = now() WHERE id = ${orderId}::uuid`;
 
         const totalFormatted = 'R$ ' + (totalCents / 100).toFixed(2).replace('.', ',');
 
         return res.status(200).json({
             order_id: String(orderId),
-            pix_payload: pixPayload,
+            checkout_url: checkoutUrl,
             total_formatted: totalFormatted
         });
     } catch (err) {

@@ -222,6 +222,42 @@ Reinicie o `dev-server.js` depois de mudar o `.env`.
 
 ---
 
+## 10. Acompanhamento de preparo (cozinha)
+
+Cada pedido **pago** ganha no painel um controle de tres estados:
+
+```
+Na fila  ->  Em preparo  ->  Entregue
+```
+
+A equipe clica direto no card. Da para voltar um estado (corrige clique errado).
+O painel mostra ha quanto tempo o pedido esta no estado atual, para nao esquecerem
+ninguem na fila.
+
+### Dois eixos separados
+
+`status` e o estado do PAGAMENTO (`pending`/`approved`/`rejected`), decidido
+**apenas** pelo webhook depois de conferir na InfinitePay.
+
+`prep_status` e o estado da COZINHA (`waiting`/`preparing`/`delivered`), decidido
+pela equipe no painel.
+
+Sao colunas diferentes de proposito: **nenhuma acao de tela pode marcar um pedido
+como pago**. O endpoint so aceita pedidos que ja estao `approved`.
+
+### Filtro "Cozinha"
+
+O chip **Cozinha** mostra a fila real de trabalho: pago e ainda nao entregue.
+E a visao que a equipe deve deixar aberta durante o evento.
+
+### Migracao
+
+Rode [`migrations/002_preparo.sql`](migrations/002_preparo.sql). Alem das colunas,
+ele cria um CHECK constraint: um valor invalido e recusado **pelo banco**, mesmo
+que alguem tente por SQL direto.
+
+---
+
 ## Segurança (mantida)
 - [x] Preço **sempre** recalculado no servidor ([`api/create-order.js`](api/create-order.js)); o cliente manda só `id`+`quantidade`.
 - [x] O valor do Pix é o total calculado no servidor — o navegador não influencia o valor cobrado.
@@ -250,6 +286,8 @@ Reinicie o `dev-server.js` depois de mudar o `.env`.
 | [`dev-server.js`](dev-server.js) | Servidor local que imita a Vercel (so para desenvolvimento) |
 | [`admin.html`](admin.html) | Painel de pedidos (login, filtros, auto-refresh) |
 | [`api/admin-orders.js`](api/admin-orders.js) | Lista os pedidos para o painel (protegido por senha) |
+| [`api/admin-update-order.js`](api/admin-update-order.js) | Muda o estado de preparo (so em pedido pago) |
+| [`migrations/002_preparo.sql`](migrations/002_preparo.sql) | Colunas de preparo + CHECK constraint |
 | [`api/_auth.js`](api/_auth.js) | Checagem da senha do painel, em tempo constante |
 | `index.html` / `script.js` / `style.css` | Carrinho, drawer, checkout e tela do Pix |
 

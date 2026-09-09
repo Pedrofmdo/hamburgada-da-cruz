@@ -6,8 +6,10 @@
 //  Protegido por senha (header x-admin-password).
 //
 //  Query params:
-//    ?range=today|7d|all   (padrão: today)
-//    ?status=all|paid|pending  (padrão: all)
+//    ?range=today|7d|all             (padrão: today)
+//    ?status=all|paid|pending|queue  (padrão: all)
+//
+//  'queue' é a fila da cozinha: pago e ainda não entregue.
 // ─────────────────────────────────────────────────────────────
 const { sql } = require('@vercel/postgres');
 const { checkAdminAuth } = require('./_auth');
@@ -30,23 +32,27 @@ module.exports = async (req, res) => {
 
     try {
         const range = ['today', '7d', 'all'].includes(req.query.range) ? req.query.range : 'today';
-        const status = ['all', 'paid', 'pending'].includes(req.query.status) ? req.query.status : 'all';
+        const status = ['all', 'paid', 'pending', 'queue'].includes(req.query.status) ? req.query.status : 'all';
 
         // Intervalo em horas (null = sem filtro de data).
         const hours = range === 'today' ? 24 : range === '7d' ? 168 : null;
         const onlyPaid = status === 'paid';
         const onlyPending = status === 'pending';
+        // Fila da cozinha: pago e ainda não entregue.
+        const onlyQueue = status === 'queue';
 
         // Uma query só, com os filtros neutralizados por flag —
         // evita montar SQL por concatenação (risco de injection).
         const result = await sql`
             SELECT id, items, customer_name, customer_phone, customer_email,
                    fulfillment, total_cents, status, created_at, updated_at,
-                   payment_method, paid_amount_cents, installments, receipt_url
+                   payment_method, paid_amount_cents, installments, receipt_url,
+                   prep_status, prep_updated_at
             FROM orders
             WHERE (${hours}::int IS NULL OR created_at >= now() - (${hours}::int * INTERVAL '1 hour'))
               AND (${onlyPaid}::boolean = false OR status = 'approved')
               AND (${onlyPending}::boolean = false OR status = 'pending')
+              AND (${onlyQueue}::boolean = false OR (status = 'approved' AND prep_status <> 'delivered'))
             ORDER BY created_at DESC
             LIMIT ${MAX_ROWS}
         `;
@@ -67,7 +73,9 @@ module.exports = async (req, res) => {
                 payment_method: r.payment_method,
                 paid_amount_cents: r.paid_amount_cents,
                 installments: r.installments,
-                receipt_url: r.receipt_url
+                receipt_url: r.receipt_url,
+                prep_status: r.prep_status || 'waiting',
+                prep_updated_at: r.prep_updated_at
             };
         });
 
@@ -78,7 +86,10 @@ module.exports = async (req, res) => {
             total_orders: orders.length,
             paid_orders: paid.length,
             pending_orders: orders.filter(function (o) { return o.status === 'pending'; }).length,
-            revenue_cents: paid.reduce(function (sum, o) { return sum + o.total_cents; }, 0)
+            revenue_cents: paid.reduce(function (sum, o) { return sum + o.total_cents; }, 0),
+            // Carga da cozinha agora.
+            queue_orders: paid.filter(function (o) { return o.prep_status !== 'delivered'; }).length,
+            preparing_orders: paid.filter(function (o) { return o.prep_status === 'preparing'; }).length
         };
 
         return res.status(200).json({ orders: orders, summary: summary, range: range, status: status });

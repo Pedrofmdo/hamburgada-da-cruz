@@ -118,6 +118,7 @@
         .stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px; }
         .stat-value { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .stat-value.gold { color: var(--gold); }
+        .stat-value.cook { color: #E08A3C; }
         .stat-value.green { color: var(--green); }
 
         /* ===== Filtros ===== */
@@ -193,6 +194,58 @@
         .line-price { color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
         .order-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+        /* ===== Controle de preparo ===== */
+        .prep {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border-subtle);
+        }
+
+        .prep-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-right: 2px;
+        }
+
+        .prep-btns { display: flex; gap: 0; border-radius: 9999px; overflow: hidden; border: 1px solid var(--border-subtle); }
+
+        .prep-btn {
+            padding: 8px 15px;
+            background: transparent;
+            border: none;
+            border-right: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            white-space: nowrap;
+        }
+        .prep-btn:last-child { border-right: none; }
+        .prep-btn:hover:not(:disabled) { background: rgba(212, 175, 55, 0.1); color: var(--text-primary); }
+        .prep-btn:disabled { opacity: 0.5; cursor: wait; }
+
+        .prep-btn[aria-pressed="true"] { font-weight: 700; color: #fff; }
+        .prep-btn[data-prep="waiting"][aria-pressed="true"]   { background: var(--gold-dark); }
+        .prep-btn[data-prep="preparing"][aria-pressed="true"] { background: #C4772D; }
+        .prep-btn[data-prep="delivered"][aria-pressed="true"] { background: var(--green); }
+
+        .prep-since { font-size: 0.72rem; color: var(--text-muted); }
+
+        /* Um pedido entregue sai do caminho visualmente. */
+        .order.done { opacity: 0.55; }
+        .order.done:hover { opacity: 1; }
+
+        /* Pedido em preparo se destaca na lista. */
+        .order.cooking { border-left-color: #C4772D; }
+
         .total { font-size: 1.2rem; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; }
         .paid-extra { display: block; font-size: 0.72rem; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
         .contact { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.84rem; }
@@ -239,6 +292,7 @@
             <button class="chip" data-range="7d" aria-pressed="false">7 dias</button>
             <button class="chip" data-range="all" aria-pressed="false">Tudo</button>
             <div class="sep"></div>
+            <button class="chip" data-status="queue" aria-pressed="false">🔥 Cozinha</button>
             <button class="chip" data-status="all" aria-pressed="true">Todos</button>
             <button class="chip" data-status="paid" aria-pressed="false">Pagos</button>
             <button class="chip" data-status="pending" aria-pressed="false">Aguardando</button>
@@ -321,6 +375,8 @@
                     '<div class="stat-value green">' + brl(s.revenue_cents) + '</div></div>' +
                     '<div class="stat"><div class="stat-label">Pedidos pagos</div>' +
                     '<div class="stat-value green">' + s.paid_orders + '</div></div>' +
+                    '<div class="stat"><div class="stat-label">Na cozinha</div>' +
+                    '<div class="stat-value cook">' + (s.queue_orders || 0) + '</div></div>' +
                     '<div class="stat"><div class="stat-label">Aguardando pagamento</div>' +
                     '<div class="stat-value gold">' + s.pending_orders + '</div></div>' +
                     '<div class="stat"><div class="stat-label">Total de pedidos</div>' +
@@ -350,6 +406,42 @@
                 var dif = o.paid_amount_cents - o.total_cents;
                 return '<span class="paid-extra">cliente pagou ' + brl(o.paid_amount_cents) +
                     ' (+' + brl(dif) + ' de taxa)</span>';
+            }
+
+            // ── Controle de preparo (só para pedido pago) ──
+            var PREP = [
+                { key: 'waiting', label: 'Na fila' },
+                { key: 'preparing', label: 'Em preparo' },
+                { key: 'delivered', label: 'Entregue' }
+            ];
+
+            function haQuantoTempo(iso) {
+                if (!iso) return '';
+                var min = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+                if (min < 1) return 'agora';
+                if (min < 60) return 'há ' + min + ' min';
+                var h = Math.floor(min / 60);
+                return 'há ' + h + 'h' + (min % 60 ? (min % 60) + 'min' : '');
+            }
+
+            function prepControl(o) {
+                if (o.status !== 'approved') return '';
+                var atual = o.prep_status || 'waiting';
+
+                var btns = PREP.map(function (p) {
+                    return '<button type="button" class="prep-btn" data-prep="' + p.key + '" ' +
+                        'data-order="' + esc(o.id) + '" aria-pressed="' + (p.key === atual) + '">' +
+                        p.label + '</button>';
+                }).join('');
+
+                // Mostra há quanto tempo está no estado atual — ajuda a
+                // ver pedido esquecido na fila.
+                var desde = (atual !== 'waiting' && o.prep_updated_at)
+                    ? '<span class="prep-since">' + esc(haQuantoTempo(o.prep_updated_at)) + '</span>'
+                    : '';
+
+                return '<div class="prep"><span class="prep-label">Preparo</span>' +
+                    '<div class="prep-btns">' + btns + '</div>' + desde + '</div>';
             }
 
             function comprovante(o) {
@@ -389,7 +481,11 @@
                             '<i class="far fa-envelope"></i> ' + esc(o.customer_email) + '</a>';
                     }
 
-                    return '<article class="order ' + (paid ? 'paid' : 'pending') + '" data-id="' + esc(o.id) + '">' +
+                    var extraClass = '';
+                    if (paid && o.prep_status === 'delivered') extraClass = ' done';
+                    else if (paid && o.prep_status === 'preparing') extraClass = ' cooking';
+
+                    return '<article class="order ' + (paid ? 'paid' : 'pending') + extraClass + '" data-id="' + esc(o.id) + '">' +
                         '<div class="order-top">' +
                         '<div><div class="order-who">' + esc(o.customer_name) + '</div>' +
                         '<div class="order-meta">#' + esc(o.short_id) + ' · ' + esc(timeOf(o.created_at)) + '</div></div>' +
@@ -399,7 +495,7 @@
                         '<div class="order-bottom">' +
                         '<div class="total">' + brl(o.total_cents) + extraPago(o) + '</div>' +
                         '<div class="contact">' + contato + comprovante(o) + '</div>' +
-                        '</div></article>';
+                        '</div>' + prepControl(o) + '</article>';
                 }).join('');
 
                 ordersEl.innerHTML = html;
@@ -496,6 +592,53 @@
                             ? 'Senha inválida.' : err.message;
                     })
                     .then(function () { loginBtn.disabled = false; });
+            });
+
+            // ── Mudar o preparo ──
+            // Delegação: os cards são recriados a cada atualização,
+            // então o listener fica no container, não em cada botão.
+            ordersEl.addEventListener('click', function (e) {
+                var btn = e.target.closest ? e.target.closest('.prep-btn') : null;
+                if (!btn || btn.disabled) return;
+
+                var orderId = btn.dataset.order;
+                var novo = btn.dataset.prep;
+                var grupo = btn.parentNode.querySelectorAll('.prep-btn');
+
+                // Já está nesse estado: não gasta request.
+                if (btn.getAttribute('aria-pressed') === 'true') return;
+
+                // Resposta imediata na tela; se falhar, o próximo
+                // refresh devolve o estado real do servidor.
+                grupo.forEach(function (b) {
+                    b.setAttribute('aria-pressed', String(b === btn));
+                    b.disabled = true;
+                });
+
+                fetch('/api/admin-update-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-admin-password': password
+                    },
+                    body: JSON.stringify({ id: orderId, prep_status: novo })
+                })
+                    .then(function (r) {
+                        if (r.status === 401) throw new Error('unauthorized');
+                        return r.json().then(function (d) {
+                            if (!r.ok) throw new Error(d.error || 'Não foi possível atualizar.');
+                            return d;
+                        });
+                    })
+                    .then(function () { return load(); })
+                    .catch(function (err) {
+                        if (err.message === 'unauthorized') { logout('Sessão expirada.'); return; }
+                        alert(err.message);
+                        load(); // volta ao estado real
+                    })
+                    .then(function () {
+                        grupo.forEach(function (b) { b.disabled = false; });
+                    });
             });
 
             document.getElementById('logout').addEventListener('click', function () { logout(); });

@@ -32,7 +32,8 @@ module.exports = async (req, res) => {
 
     try {
         const range = ['today', '7d', 'all'].includes(req.query.range) ? req.query.range : 'today';
-        const status = ['all', 'paid', 'pending', 'queue'].includes(req.query.status) ? req.query.status : 'all';
+        const status = ['all', 'paid', 'pending', 'queue', 'delivered'].includes(req.query.status)
+            ? req.query.status : 'queue';
 
         // Intervalo em horas (null = sem filtro de data).
         const hours = range === 'today' ? 24 : range === '7d' ? 168 : null;
@@ -40,6 +41,7 @@ module.exports = async (req, res) => {
         const onlyPending = status === 'pending';
         // Fila da cozinha: pago e ainda não entregue.
         const onlyQueue = status === 'queue';
+        const onlyDelivered = status === 'delivered';
 
         // Uma query só, com os filtros neutralizados por flag —
         // evita montar SQL por concatenação (risco de injection).
@@ -53,6 +55,7 @@ module.exports = async (req, res) => {
               AND (${onlyPaid}::boolean = false OR status = 'approved')
               AND (${onlyPending}::boolean = false OR status = 'pending')
               AND (${onlyQueue}::boolean = false OR (status = 'approved' AND prep_status <> 'delivered'))
+              AND (${onlyDelivered}::boolean = false OR (status = 'approved' AND prep_status = 'delivered'))
             ORDER BY created_at DESC
             LIMIT ${MAX_ROWS}
         `;
@@ -79,17 +82,34 @@ module.exports = async (req, res) => {
             };
         });
 
-        // Resumo do período — o painel mostra no topo.
-        // Só conta faturamento do que foi realmente pago.
-        const paid = orders.filter(function (o) { return o.status === 'approved'; });
+        // ── Resumo do PERÍODO, não da aba aberta ──
+        //  Contado no banco, ignorando o filtro de status: senão, abrir
+        //  a aba "Entregues" faria o painel dizer que só existem
+        //  entregues. Também não sofre com o LIMIT da listagem.
+        const counts = await sql`
+            SELECT
+                count(*)::int AS total,
+                count(*) FILTER (WHERE status = 'approved')::int AS paid,
+                count(*) FILTER (WHERE status = 'pending')::int AS pending,
+                count(*) FILTER (WHERE status = 'approved' AND prep_status <> 'delivered')::int AS queue,
+                count(*) FILTER (WHERE status = 'approved' AND prep_status = 'preparing')::int AS preparing,
+                count(*) FILTER (WHERE status = 'approved' AND prep_status = 'delivered')::int AS delivered,
+                COALESCE(sum(total_cents) FILTER (WHERE status = 'approved'), 0)::int AS revenue_cents
+            FROM orders
+            WHERE (${hours}::int IS NULL OR created_at >= now() - (${hours}::int * INTERVAL '1 hour'))
+        `;
+        const c = counts.rows[0];
+
         const summary = {
-            total_orders: orders.length,
-            paid_orders: paid.length,
-            pending_orders: orders.filter(function (o) { return o.status === 'pending'; }).length,
-            revenue_cents: paid.reduce(function (sum, o) { return sum + o.total_cents; }, 0),
-            // Carga da cozinha agora.
-            queue_orders: paid.filter(function (o) { return o.prep_status !== 'delivered'; }).length,
-            preparing_orders: paid.filter(function (o) { return o.prep_status === 'preparing'; }).length
+            total_orders: c.total,
+            paid_orders: c.paid,
+            pending_orders: c.pending,
+            revenue_cents: c.revenue_cents,
+            queue_orders: c.queue,
+            preparing_orders: c.preparing,
+            delivered_orders: c.delivered,
+            // Avisa o painel quando a listagem foi cortada pelo limite.
+            truncated: orders.length >= MAX_ROWS
         };
 
         return res.status(200).json({ orders: orders, summary: summary, range: range, status: status });

@@ -117,12 +117,66 @@
         }
         .stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px; }
         .stat-value { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .stat-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
         .stat-value.gold { color: var(--gold); }
         .stat-value.cook { color: #E08A3C; }
         .stat-value.green { color: var(--green); }
 
-        /* ===== Filtros ===== */
-        .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        /* ===== Abas ===== */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 0;
+        }
+
+        .tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 18px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.15s, border-color 0.15s;
+            white-space: nowrap;
+        }
+        .tab:hover { color: var(--text-primary); }
+        .tab[aria-pressed="true"] { color: var(--gold); border-bottom-color: var(--gold); font-weight: 700; }
+        .tab i { font-size: 0.85rem; }
+
+        .count {
+            display: inline-block;
+            min-width: 21px;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            background: var(--bg-elevated);
+            font-size: 0.72rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+        .tab[aria-pressed="true"] .count { background: var(--gold); color: var(--bg-deep); }
+        /* Fila com pedido esperando chama atenção. */
+        .count.busy { background: #C4772D; color: #fff; }
+
+        /* ===== Período ===== */
+        .period { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .period-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-right: 2px;
+        }
         .chip {
             padding: 8px 15px;
             background: var(--bg-card);
@@ -287,15 +341,26 @@
 
         <div class="summary" id="summary"></div>
 
-        <div class="filters">
+        <nav class="tabs" role="tablist" aria-label="Filtrar pedidos">
+            <button class="tab" data-status="queue" aria-pressed="true">
+                <i class="fas fa-fire"></i> Cozinha <span class="count" id="c-queue">0</span>
+            </button>
+            <button class="tab" data-status="delivered" aria-pressed="false">
+                <i class="fas fa-circle-check"></i> Entregues <span class="count" id="c-delivered">0</span>
+            </button>
+            <button class="tab" data-status="pending" aria-pressed="false">
+                <i class="far fa-clock"></i> Aguardando <span class="count" id="c-pending">0</span>
+            </button>
+            <button class="tab" data-status="all" aria-pressed="false">
+                <i class="fas fa-list"></i> Todos <span class="count" id="c-all">0</span>
+            </button>
+        </nav>
+
+        <div class="period">
+            <span class="period-label">Período</span>
             <button class="chip" data-range="today" aria-pressed="true">Hoje</button>
             <button class="chip" data-range="7d" aria-pressed="false">7 dias</button>
             <button class="chip" data-range="all" aria-pressed="false">Tudo</button>
-            <div class="sep"></div>
-            <button class="chip" data-status="queue" aria-pressed="false">🔥 Cozinha</button>
-            <button class="chip" data-status="all" aria-pressed="true">Todos</button>
-            <button class="chip" data-status="paid" aria-pressed="false">Pagos</button>
-            <button class="chip" data-status="pending" aria-pressed="false">Aguardando</button>
         </div>
 
         <div id="orders"></div>
@@ -325,7 +390,7 @@
 
             var password = '';
             var range = 'today';
-            var status = 'all';
+            var status = 'queue';
             var timer = null;
             var knownPaid = null; // null = ainda não carregou a 1ª vez
 
@@ -370,17 +435,35 @@
 
             // ── Render ──
             function renderSummary(s) {
+                var emPreparo = s.preparing_orders
+                    ? '<div class="stat-sub">' + s.preparing_orders + ' na chapa</div>' : '';
+
                 summaryEl.innerHTML =
                     '<div class="stat"><div class="stat-label">Faturamento pago</div>' +
-                    '<div class="stat-value green">' + brl(s.revenue_cents) + '</div></div>' +
-                    '<div class="stat"><div class="stat-label">Pedidos pagos</div>' +
-                    '<div class="stat-value green">' + s.paid_orders + '</div></div>' +
+                    '<div class="stat-value green">' + brl(s.revenue_cents) + '</div>' +
+                    '<div class="stat-sub">' + s.paid_orders + ' pedido' + (s.paid_orders === 1 ? '' : 's') + '</div></div>' +
+
                     '<div class="stat"><div class="stat-label">Na cozinha</div>' +
-                    '<div class="stat-value cook">' + (s.queue_orders || 0) + '</div></div>' +
+                    '<div class="stat-value cook">' + (s.queue_orders || 0) + '</div>' + emPreparo + '</div>' +
+
+                    '<div class="stat"><div class="stat-label">Entregues</div>' +
+                    '<div class="stat-value green">' + (s.delivered_orders || 0) + '</div></div>' +
+
                     '<div class="stat"><div class="stat-label">Aguardando pagamento</div>' +
-                    '<div class="stat-value gold">' + s.pending_orders + '</div></div>' +
-                    '<div class="stat"><div class="stat-label">Total de pedidos</div>' +
-                    '<div class="stat-value">' + s.total_orders + '</div></div>';
+                    '<div class="stat-value gold">' + s.pending_orders + '</div></div>';
+
+                // Contadores das abas — sempre do período, nunca da aba aberta.
+                setCount('c-queue', s.queue_orders, true);
+                setCount('c-delivered', s.delivered_orders, false);
+                setCount('c-pending', s.pending_orders, false);
+                setCount('c-all', s.total_orders, false);
+            }
+
+            function setCount(id, value, destaca) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                el.textContent = value || 0;
+                el.className = 'count' + (destaca && value > 0 ? ' busy' : '');
             }
 
             function badgeFor(o) {
@@ -452,8 +535,13 @@
 
             function renderOrders(orders, isFirstLoad) {
                 if (!orders.length) {
-                    ordersEl.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i>' +
-                        'Nenhum pedido neste filtro.</div>';
+                    var msg = {
+                        queue: 'Nenhum pedido na fila. Tudo entregue!',
+                        delivered: 'Nenhum pedido entregue neste período.',
+                        pending: 'Nenhum pedido aguardando pagamento.',
+                        all: 'Nenhum pedido neste período.'
+                    }[status] || 'Nenhum pedido neste filtro.';
+                    ordersEl.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i>' + msg + '</div>';
                     return;
                 }
 
@@ -643,14 +731,16 @@
 
             document.getElementById('logout').addEventListener('click', function () { logout(); });
 
-            document.querySelectorAll('.chip').forEach(function (chip) {
-                chip.addEventListener('click', function () {
-                    var group = chip.dataset.range ? 'range' : 'status';
-                    var value = chip.dataset.range || chip.dataset.status;
-                    document.querySelectorAll('.chip[data-' + group + ']').forEach(function (c) {
-                        c.setAttribute('aria-pressed', String(c === chip));
+            document.querySelectorAll('.chip, .tab').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var group = btn.dataset.range ? 'range' : 'status';
+                    var value = btn.dataset.range || btn.dataset.status;
+                    document.querySelectorAll('[data-' + group + ']').forEach(function (c) {
+                        c.setAttribute('aria-pressed', String(c === btn));
                     });
                     if (group === 'range') { range = value; } else { status = value; }
+                    // Troca de aba: o "novo pago" da aba anterior nao deve
+                    // disparar bipe de novo ao reaparecer noutra lista.
                     load().catch(function (e) { if (e.message === 'unauthorized') logout('Sessão expirada.'); });
                 });
             });

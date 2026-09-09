@@ -245,10 +245,18 @@ pela equipe no painel.
 Sao colunas diferentes de proposito: **nenhuma acao de tela pode marcar um pedido
 como pago**. O endpoint so aceita pedidos que ja estao `approved`.
 
-### Filtro "Cozinha"
+### Abas do painel
 
-O chip **Cozinha** mostra a fila real de trabalho: pago e ainda nao entregue.
-E a visao que a equipe deve deixar aberta durante o evento.
+| Aba | Mostra |
+|---|---|
+| **Cozinha** (padrao) | Pago e ainda nao entregue — a fila de trabalho |
+| **Entregues** | Pago e ja entregue — historico do dia |
+| **Aguardando** | Pedido criado, pagamento nao confirmado |
+| **Todos** | Tudo do periodo |
+
+Cada aba tem um contador. Os contadores sao calculados **sobre o periodo inteiro,
+no banco** — nunca sobre a aba aberta, senao abrir "Entregues" faria o painel
+dizer que so existem entregues. Tambem nao sofrem com o LIMIT da listagem.
 
 ### Migracao
 

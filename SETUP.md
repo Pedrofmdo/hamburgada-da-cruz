@@ -152,7 +152,7 @@ Cliente finaliza o pedido
 3. Variaveis de ambiente:
 
 ```
-INFINITEPAY_HANDLE=pedro-jorge-2d8      # InfiniteTag SEM o "$"
+INFINITEPAY_HANDLE=ccaminhodacruz       # InfiniteTag SEM o "$"
 PUBLIC_BASE_URL=https://seusite.com     # sem barra no final
 ```
 

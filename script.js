@@ -333,16 +333,6 @@ var menuItemsData = [
         price: "R$ 18,00",
         image: "IMGS/Cookie-Limão-Frutas-vermelhas.jpeg",
         category: "cookie"
-    },
-    // TEMPORÁRIO — só para testar pagamento real (Pix e cartão).
-    // Remover, junto com o item 99 do api/_menu.js, antes de ir para produção.
-    {
-        id: 99,
-        name: "Item de teste",
-        description: "Só para testar o pagamento. Não é um produto de verdade.",
-        price: "R$ 1,00",
-        image: "IMGS/Batata.jpg",
-        category: "acompanhamento"
     }
 ];
 

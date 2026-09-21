@@ -18,10 +18,7 @@ const MENU = {
     8:  { name: 'Guaraná Zero',                                priceCents: 800 },
     9:  { name: 'Cookie Chocochip',                           priceCents: 1400 },
     11: { name: 'Cookie Nutella',                             priceCents: 1800 },
-    12: { name: 'Cookie Limão Siciliano com Frutas Vermelhas', priceCents: 1800 },
-    // TEMPORÁRIO — só para testar pagamento real (Pix e cartão).
-    // Remover, junto com o item 99 do script.js, antes de ir para produção.
-    99: { name: 'Item de teste', priceCents: 100 }
+    12: { name: 'Cookie Limão Siciliano com Frutas Vermelhas', priceCents: 1800 }
 };
 
 function getMenuItem(id) {

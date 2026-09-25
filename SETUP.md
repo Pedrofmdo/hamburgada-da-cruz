@@ -266,6 +266,64 @@ que alguem tente por SQL direto.
 
 ---
 
+## 11. Itens esgotados e cancelamento de pedidos
+
+### Aba "Itens" do painel
+
+Liga e desliga cada item do cardapio, sem deploy. Serve para quando
+acaba algo no meio do evento: desliga no painel e o item sai do site na hora.
+
+O item desligado **continua aparecendo** no cardapio, apagado e com o selo
+"Esgotado hoje". E mais honesto do que sumir: o cliente ve que o produto
+existe e acabou hoje, em vez de achar que o site esta incompleto. Se a
+categoria inteira acabar, o filtro dela some.
+
+**Onde fica o que:**
+
+| | Onde | Por que |
+|---|---|---|
+| Nome e preco | `api/_menu.js` (codigo) | Preco nao pode ser alterado por ninguem de fora |
+| Ligado/desligado | tabela `menu_availability` | Muda durante o evento, sem deploy |
+
+Item que nao esta na tabela conta como **a venda**. Nao e preciso semear nada,
+e um item novo ja nasce vendendo.
+
+**Tres camadas, porque a tela nunca e a unica defesa:**
+
+1. O cardapio marca o item como esgotado (`/api/menu-status`)
+2. O botao de adicionar fica travado
+3. **`create-order` recusa com 409** — pega quem estava com a pagina aberta
+   desde antes de o item acabar, e diz qual item foi
+
+Se a tabela ainda nao existir (migracao 003 nao rodada), `idsEsgotados()`
+devolve vazio em vez de estourar: um deploy fora de ordem nao derruba a
+venda do site.
+
+### Cancelar pedido parado
+
+Pedido que fica `pending` e cliente que desistiu no meio do pagamento. Na aba
+**Aguardando** cada pedido ganha um botao **Cancelar**, e ha um botao para
+cancelar de uma vez todos os parados.
+
+**Duas travas** em `api/admin-cancel-order.js`:
+
+1. So cancela quem esta `pending` — pedido pago nunca e tocado
+2. So depois de **10 minutos** — o webhook chega em segundos, e a espera
+   evita cancelar alguem que esta com o app do banco aberto. Antes disso o
+   botao aparece travado, contando quanto falta.
+
+Cancelar aqui e uma anotacao nossa: **nao estorna nada** e nao fala com a
+InfinitePay. Se o pagamento cair depois, o webhook acha o pedido e marca
+como pago normalmente — ou seja, um cancelamento errado se conserta sozinho.
+
+### Migracao
+
+Rode [`migrations/003_disponibilidade.sql`](migrations/003_disponibilidade.sql)
+**antes** de subir esta versao. Sem ela, a aba Itens nao carrega (o resto do
+site continua normal).
+
+---
+
 ## Segurança (mantida)
 - [x] Preço **sempre** recalculado no servidor ([`api/create-order.js`](api/create-order.js)); o cliente manda só `id`+`quantidade`.
 - [x] O valor do Pix é o total calculado no servidor — o navegador não influencia o valor cobrado.
@@ -296,6 +354,11 @@ que alguem tente por SQL direto.
 | [`api/admin-orders.js`](api/admin-orders.js) | Lista os pedidos para o painel (protegido por senha) |
 | [`api/admin-update-order.js`](api/admin-update-order.js) | Muda o estado de preparo (so em pedido pago) |
 | [`migrations/002_preparo.sql`](migrations/002_preparo.sql) | Colunas de preparo + CHECK constraint |
+| [`api/_availability.js`](api/_availability.js) | Liga/desliga de item (so o estado; preco fica no _menu.js) |
+| [`api/menu-status.js`](api/menu-status.js) | Publico: diz ao site o que esta esgotado |
+| [`api/admin-menu.js`](api/admin-menu.js) | Aba Itens do painel (listar e alternar) |
+| [`api/admin-cancel-order.js`](api/admin-cancel-order.js) | Cancela pedido parado ha mais de 10 min |
+| [`migrations/003_disponibilidade.sql`](migrations/003_disponibilidade.sql) | Tabela `menu_availability` |
 | [`api/_auth.js`](api/_auth.js) | Checagem da senha do painel, em tempo constante |
 | `index.html` / `script.js` / `style.css` | Carrinho, drawer, checkout e tela do Pix |
 

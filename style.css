@@ -3094,3 +3094,43 @@ a {
         border-left: none;
     }
 }
+
+/* ── Item esgotado ─────────────────────────────────────────── */
+/* Fica visível, mas apagado: o cliente entende que existe e
+   acabou hoje, em vez de achar que o site está incompleto. */
+.bento-item.esgotado .bento-img {
+    filter: grayscale(0.85) brightness(0.55);
+}
+
+.bento-item.esgotado:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--border-subtle);
+}
+
+.bento-item.esgotado:hover .bento-img {
+    transform: none;
+}
+
+.bento-item.esgotado::after {
+    content: 'Esgotado hoje';
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 5;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    background: rgba(11, 11, 12, 0.88);
+    border: 1px solid var(--ember);
+    color: var(--ember-light);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.bento-item.esgotado .bento-add-btn {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}

@@ -14,6 +14,7 @@
 // ─────────────────────────────────────────────────────────────
 const { sql } = require('@vercel/postgres');
 const { getMenuItem } = require('./_menu');
+const { idsEsgotados } = require('./_availability');
 const { createPaymentLink } = require('./_infinitepay');
 
 const MAX_QTY_PER_ITEM = 50;
@@ -93,6 +94,20 @@ module.exports = async (req, res) => {
 
         if (storedItems.length === 0) {
             return res.status(400).json({ error: 'Seu carrinho está vazio.' });
+        }
+
+        // ── Algum item acabou? ──
+        // Checagem no servidor: a página do cliente pode estar
+        // aberta desde antes de o item ser esgotado no painel.
+        const esgotados = await idsEsgotados();
+        const acabaram = storedItems.filter(function (it) { return esgotados.has(it.id); });
+
+        if (acabaram.length > 0) {
+            const nomes = acabaram.map(function (it) { return it.name; }).join(', ');
+            return res.status(409).json({
+                error: (acabaram.length === 1 ? 'Acabou: ' : 'Acabaram: ') + nomes +
+                    '. Remova da sacola para continuar.'
+            });
         }
 
         // ── Cria o pedido pendente no banco ──

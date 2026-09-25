@@ -309,6 +309,30 @@ var menuItemsData = [
         price: "R$ 8,00",
         image: "IMGS/Guarana.jpg",
         category: "acompanhamento"
+    },
+    {
+        id: 9,
+        name: "Cookie Chocochip",
+        description: "Massa tradicional, com gotas de chocolate e finalizado com flor de sal",
+        price: "R$ 14,00",
+        image: "IMGS/Chocochip.jpeg",
+        category: "cookie"
+    },
+    {
+        id: 11,
+        name: "Cookie Nutella",
+        description: "Massa tradicional, gotas de chocolate preto, recheio de nutella e finalizado com flor de sal",
+        price: "R$ 18,00",
+        image: "IMGS/Nutela.jpeg",
+        category: "cookie"
+    },
+    {
+        id: 12,
+        name: "Cookie Limão Siciliano com Frutas Vermelhas",
+        description: "Massa tradicional, gotas de chocolate branco, recheado de brigadeiro de limão siciliano e geleia de frutas vermelhas",
+        price: "R$ 18,00",
+        image: "IMGS/Cookie-Limão-Frutas-vermelhas.jpeg",
+        category: "cookie"
     }
 ];
 
@@ -337,9 +361,49 @@ function populateMenu() {
     menuGrid.innerHTML = html;
 }
 
+// ===== Itens esgotados =====
+// O cardápio já aparece pelo código; esta consulta só marca o que
+// acabou. Se falhar, o site segue normal e quem barra é o servidor,
+// no create-order — a tela nunca é a única defesa.
+window.itensEsgotados = [];
+
+function marcarEsgotados() {
+    fetch('/api/menu-status', { cache: 'no-store' })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            var lista = (d && d.esgotados) || [];
+            window.itensEsgotados = lista;
+
+            document.querySelectorAll('.bento-item').forEach(function(card) {
+                var btn = card.querySelector('[data-add]');
+                if (!btn) return;
+                var id = parseInt(btn.getAttribute('data-add'), 10);
+                var acabou = lista.indexOf(id) !== -1;
+
+                card.classList.toggle('esgotado', acabou);
+                btn.disabled = acabou;
+                var rotulo = btn.querySelector('span');
+                if (rotulo) rotulo.textContent = acabou ? 'Esgotado' : 'Adicionar';
+            });
+
+            // Categoria inteira esgotada: esconde o filtro dela.
+            document.querySelectorAll('.filter-pill[data-filter]').forEach(function(pill) {
+                var cat = pill.dataset.filter;
+                if (cat === 'all') return;
+                var daCategoria = menuItemsData.filter(function(i) { return i.category === cat; });
+                var todosFora = daCategoria.length > 0 && daCategoria.every(function(i) {
+                    return lista.indexOf(i.id) !== -1;
+                });
+                pill.hidden = todosFora;
+            });
+        })
+        .catch(function() { /* sem rede: cardápio segue completo */ });
+}
+
 // ===== Initialize =====
 function init() {
     populateMenu();
+    marcarEsgotados();
 
     // ── Menu Filters ──
     var filterButtons = document.querySelectorAll('.filter-pill');
@@ -675,6 +739,10 @@ function showNotification(message, type) {
         if (!addBtn) return;
         var id = parseInt(addBtn.getAttribute('data-add'), 10);
         if (!findMenuItem(id)) return;
+        if (window.itensEsgotados && window.itensEsgotados.indexOf(id) !== -1) {
+            showNotification('Esse item acabou por hoje. 😕', 'error');
+            return;
+        }
         addToCart(id);
         var item = findMenuItem(id);
         showNotification((item ? item.name : 'Item') + ' adicionado ao carrinho! 🛒', 'success');

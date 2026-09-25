@@ -5,6 +5,9 @@
 //  Nunca confie em preço vindo do navegador — TODO cálculo de
 //  total usa esta tabela. Mantenha em sincronia com
 //  `menuItemsData` (script.js) sempre que mudar o cardápio.
+//
+//  Item esgotado NÃO sai daqui: o liga/desliga fica no banco
+//  (api/_availability.js), controlado pela aba Itens do painel.
 //  Preços em CENTAVOS para evitar erro de ponto flutuante.
 // ─────────────────────────────────────────────────────────────
 const MENU = {
@@ -16,12 +19,9 @@ const MENU = {
     6:  { name: 'Coca-Cola Zero',                             priceCents: 800 },
     7:  { name: 'Guaraná',                                    priceCents: 800 },
     8:  { name: 'Guaraná Zero',                                priceCents: 800 },
-    // ESGOTADO (25/09/2026)
-//    9:  { name: 'Cookie Chocochip',                           priceCents: 1400 },
-    // ESGOTADO (25/09/2026)
-//    11: { name: 'Cookie Nutella',                             priceCents: 1800 },
-    // ESGOTADO (25/09/2026)
-//    12: { name: 'Cookie Limão Siciliano com Frutas Vermelhas', priceCents: 1800 }
+    9:  { name: 'Cookie Chocochip',                           priceCents: 1400 },
+    11: { name: 'Cookie Nutella',                             priceCents: 1800 },
+    12: { name: 'Cookie Limão Siciliano com Frutas Vermelhas', priceCents: 1800 }
 };
 
 function getMenuItem(id) {

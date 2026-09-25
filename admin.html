@@ -36,6 +36,10 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* Sem isto, [hidden] perde para display:grid/flex e o elemento
+           continua na tela mesmo escondido. */
+        [hidden] { display: none !important; }
+
         body {
             background: var(--bg-deep);
             color: var(--text-primary);
@@ -167,6 +171,118 @@
         .tab[aria-pressed="true"] .count { background: var(--gold); color: var(--bg-deep); }
         /* Fila com pedido esperando chama atenção. */
         .count.busy { background: #C4772D; color: #fff; }
+
+
+        /* ===== Aba Itens ===== */
+        .tab-itens { margin-left: auto; }
+        .tab-itens[aria-pressed="true"] .count { background: var(--ember); color: #fff; }
+        .count.esgotado { background: var(--ember); color: #fff; }
+
+        .itens-ajuda {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 18px;
+            max-width: 46rem;
+        }
+
+        .item-linha {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px;
+            padding: 15px 18px;
+            margin-bottom: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-left: 3px solid var(--green);
+            border-radius: var(--radius-md);
+            transition: border-color 0.2s, opacity 0.2s;
+        }
+
+        .item-linha.off {
+            border-left-color: var(--ember);
+            opacity: 0.72;
+        }
+
+        .item-nome { font-weight: 600; font-size: 1rem; }
+        .item-linha.off .item-nome { text-decoration: line-through; color: var(--text-muted); }
+
+        .item-preco {
+            color: var(--gold);
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
+        .item-estado {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 4px 11px;
+            border-radius: 9999px;
+            white-space: nowrap;
+        }
+        .item-estado.on { background: rgba(46, 158, 91, 0.16); color: var(--green); }
+        .item-estado.off { background: rgba(196, 75, 45, 0.18); color: var(--ember); }
+
+        .item-botao {
+            padding: 9px 18px;
+            border-radius: 9999px;
+            border: 1px solid var(--border-glow);
+            background: transparent;
+            color: var(--gold);
+            font-family: var(--font-body);
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s, color 0.2s;
+        }
+        .item-botao:hover:not(:disabled) { background: var(--gold); color: var(--bg-deep); }
+        .item-botao:disabled { opacity: 0.5; cursor: wait; }
+        .item-linha.off .item-botao { border-color: var(--green); color: var(--green); }
+        .item-linha.off .item-botao:hover:not(:disabled) { background: var(--green); color: #fff; }
+
+        /* ===== Cancelar pedido ===== */
+        .btn-cancelar {
+            padding: 7px 14px;
+            border-radius: 9999px;
+            border: 1px solid rgba(196, 75, 45, 0.5);
+            background: transparent;
+            color: var(--ember);
+            font-family: var(--font-body);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-cancelar:hover:not(:disabled) { background: var(--ember); color: #fff; }
+        .btn-cancelar:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        #acoes-lote { margin-bottom: 16px; }
+
+        .btn-lote {
+            padding: 11px 20px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(196, 75, 45, 0.45);
+            background: rgba(196, 75, 45, 0.1);
+            color: var(--ember);
+            font-family: var(--font-body);
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-lote:hover:not(:disabled) { background: var(--ember); color: #fff; }
+        .btn-lote:disabled { opacity: 0.5; cursor: wait; }
+
+        @media (max-width: 600px) {
+            .tab-itens { margin-left: 0; }
+            .item-preco { margin-left: 0; }
+            .item-linha { gap: 10px; }
+        }
 
         /* ===== Período ===== */
         .period { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 20px; }
@@ -354,16 +470,34 @@
             <button class="tab" data-status="all" aria-pressed="false">
                 <i class="fas fa-list"></i> Todos <span class="count" id="c-all">0</span>
             </button>
+            <button class="tab tab-itens" data-vista="itens" aria-pressed="false">
+                <i class="fas fa-burger"></i> Itens <span class="count" id="c-esgotados">0</span>
+            </button>
         </nav>
 
-        <div class="period">
+        <div class="period" id="period">
             <span class="period-label">Período</span>
             <button class="chip" data-range="today" aria-pressed="true">Hoje</button>
             <button class="chip" data-range="7d" aria-pressed="false">7 dias</button>
             <button class="chip" data-range="all" aria-pressed="false">Tudo</button>
         </div>
 
+        <div id="acoes-lote" hidden>
+            <button type="button" class="btn-lote" id="cancelarAntigos">
+                <i class="fas fa-ban"></i> Cancelar os que estão parados há mais de 10 min
+            </button>
+        </div>
+
         <div id="orders"></div>
+
+        <!-- Aba Itens: liga e desliga o que acabou -->
+        <div id="itens" hidden>
+            <p class="itens-ajuda">
+                Desligue o que acabou. O item some do cardápio na hora, e o site
+                recusa o pedido mesmo de quem já estava com a página aberta.
+            </p>
+            <div id="itens-lista"></div>
+        </div>
 
         <div class="foot">
             Atualizado às <span id="updated">—</span> ·
@@ -386,11 +520,16 @@
             var loginErr = document.getElementById('login-error');
             var ordersEl = document.getElementById('orders');
             var summaryEl = document.getElementById('summary');
+            var itensEl = document.getElementById('itens');
+            var itensListaEl = document.getElementById('itens-lista');
+            var periodoEl = document.getElementById('period');
+            var loteEl = document.getElementById('acoes-lote');
             var updatedEl = document.getElementById('updated');
 
             var password = '';
             var range = 'today';
             var status = 'queue';
+            var vista = 'pedidos';   // 'pedidos' | 'itens'
             var timer = null;
             var knownPaid = null; // null = ainda não carregou a 1ª vez
 
@@ -527,10 +666,31 @@
                     '<div class="prep-btns">' + btns + '</div>' + desde + '</div>';
             }
 
+            // Cancelar só aparece em pedido que ficou aguardando.
+            // Antes de 10 min o botão fica travado: o cliente pode
+            // estar com o app do banco aberto, pagando agora.
+            function MIN_CANCELAR() { return 10 * 60 * 1000; }
+
+            function botaoCancelar(o) {
+                if (o.status !== 'pending') return '';
+                var idade = Date.now() - new Date(o.created_at).getTime();
+                var podeJa = idade >= MIN_CANCELAR();
+                var faltam = Math.max(1, Math.ceil((MIN_CANCELAR() - idade) / 60000));
+                return '<button type="button" class="btn-cancelar" data-cancelar="' + esc(o.id) + '"' +
+                    (podeJa ? '' : ' disabled title="Aguarde ' + faltam + ' min"') +
+                    '><i class="fas fa-ban"></i> Cancelar' +
+                    (podeJa ? '' : ' (em ' + faltam + ' min)') + '</button>';
+            }
+
             function comprovante(o) {
                 if (!o.receipt_url) return '';
                 return '<a href="' + esc(o.receipt_url) + '" target="_blank" rel="noopener">' +
                     '<i class="fas fa-receipt"></i> Comprovante</a>';
+            }
+
+            function botaoCancelarLinha(o) {
+                var b = botaoCancelar(o);
+                return b ? '<div class="prep">' + b + '</div>' : '';
             }
 
             function renderOrders(orders, isFirstLoad) {
@@ -583,7 +743,7 @@
                         '<div class="order-bottom">' +
                         '<div class="total">' + brl(o.total_cents) + extraPago(o) + '</div>' +
                         '<div class="contact">' + contato + comprovante(o) + '</div>' +
-                        '</div>' + prepControl(o) + '</article>';
+                        '</div>' + prepControl(o) + botaoCancelarLinha(o) + '</article>';
                 }).join('');
 
                 ordersEl.innerHTML = html;
@@ -598,8 +758,56 @@
                 }
             }
 
+            // ── Alterna entre a lista de pedidos e a de itens ──
+            function aplicarVista() {
+                var ehItens = vista === 'itens';
+                itensEl.hidden = !ehItens;
+                ordersEl.hidden = ehItens;
+                summaryEl.hidden = ehItens;
+                periodoEl.hidden = ehItens;
+                loteEl.hidden = ehItens || status !== 'pending';
+                load().catch(function (e) { if (e.message === 'unauthorized') logout('Sessão expirada.'); });
+            }
+
+            // ── Aba Itens ──
+            function carregarItens() {
+                return fetch('/api/admin-menu', { headers: { 'x-admin-password': password } })
+                    .then(function (r) {
+                        if (r.status === 401) throw new Error('unauthorized');
+                        return r.json().then(function (d) {
+                            if (!r.ok) throw new Error(d.error || 'Erro ao carregar os itens.');
+                            return d;
+                        });
+                    })
+                    .then(function (d) {
+                        renderItens(d.itens);
+                        var el = document.getElementById('c-esgotados');
+                        if (el) {
+                            el.textContent = d.esgotados || 0;
+                            el.className = 'count' + (d.esgotados > 0 ? ' esgotado' : '');
+                        }
+                        updatedEl.textContent = new Date().toLocaleTimeString('pt-BR');
+                    });
+            }
+
+            function renderItens(itens) {
+                itensListaEl.innerHTML = itens.map(function (i) {
+                    var on = i.available;
+                    return '<div class="item-linha ' + (on ? '' : 'off') + '" data-item="' + i.id + '">' +
+                        '<span class="item-estado ' + (on ? 'on' : 'off') + '">' +
+                        (on ? 'À venda' : 'Esgotado') + '</span>' +
+                        '<span class="item-nome">' + esc(i.name) + '</span>' +
+                        '<span class="item-preco">' + brl(i.price_cents) + '</span>' +
+                        '<button type="button" class="item-botao" data-alternar="' + i.id + '" ' +
+                        'data-para="' + (on ? 'false' : 'true') + '">' +
+                        (on ? 'Marcar esgotado' : 'Voltar a vender') + '</button>' +
+                        '</div>';
+                }).join('');
+            }
+
             // ── Dados ──
             function load() {
+                if (vista === 'itens') return carregarItens();
                 var url = '/api/admin-orders?range=' + encodeURIComponent(range) +
                     '&status=' + encodeURIComponent(status);
 
@@ -729,16 +937,111 @@
                     });
             });
 
+            // Cancelar um pedido parado
+            ordersEl.addEventListener('click', function (e) {
+                var btn = e.target.closest ? e.target.closest('[data-cancelar]') : null;
+                if (!btn || btn.disabled) return;
+                if (!confirm('Cancelar este pedido?\n\nEle sai da lista de aguardando. Se o pagamento cair depois, o pedido volta a aparecer como pago sozinho.')) return;
+
+                btn.disabled = true;
+                fetch('/api/admin-cancel-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
+                    body: JSON.stringify({ id: btn.dataset.cancelar })
+                })
+                    .then(function (r) {
+                        if (r.status === 401) throw new Error('unauthorized');
+                        return r.json().then(function (d) {
+                            if (!r.ok) throw new Error(d.error || 'Não foi possível cancelar.');
+                            return d;
+                        });
+                    })
+                    .then(function () { return load(); })
+                    .catch(function (err) {
+                        if (err.message === 'unauthorized') { logout('Sessão expirada.'); return; }
+                        alert(err.message);
+                        btn.disabled = false;
+                    });
+            });
+
+            // Ligar / esgotar item
+            itensListaEl.addEventListener('click', function (e) {
+                var btn = e.target.closest ? e.target.closest('[data-alternar]') : null;
+                if (!btn || btn.disabled) return;
+                btn.disabled = true;
+
+                fetch('/api/admin-menu', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
+                    body: JSON.stringify({
+                        id: parseInt(btn.dataset.alternar, 10),
+                        available: btn.dataset.para === 'true'
+                    })
+                })
+                    .then(function (r) {
+                        if (r.status === 401) throw new Error('unauthorized');
+                        return r.json().then(function (d) {
+                            if (!r.ok) throw new Error(d.error || 'Não foi possível alterar.');
+                            return d;
+                        });
+                    })
+                    .then(function () { return carregarItens(); })
+                    .catch(function (err) {
+                        if (err.message === 'unauthorized') { logout('Sessão expirada.'); return; }
+                        alert(err.message);
+                        btn.disabled = false;
+                    });
+            });
+
+            // Cancelar em lote os que estão parados
+            document.getElementById('cancelarAntigos').addEventListener('click', function () {
+                var btn = this;
+                if (!confirm('Cancelar TODOS os pedidos parados há mais de 10 minutos?\n\nIsso limpa a lista de aguardando. Pedidos pagos não são tocados.')) return;
+                btn.disabled = true;
+                fetch('/api/admin-cancel-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
+                    body: JSON.stringify({ todos_antigos: true })
+                })
+                    .then(function (r) {
+                        if (r.status === 401) throw new Error('unauthorized');
+                        return r.json().then(function (d) {
+                            if (!r.ok) throw new Error(d.error || 'Não foi possível cancelar.');
+                            return d;
+                        });
+                    })
+                    .then(function (d) {
+                        alert(d.cancelados + (d.cancelados === 1 ? ' pedido cancelado.' : ' pedidos cancelados.'));
+                        return load();
+                    })
+                    .catch(function (err) {
+                        if (err.message === 'unauthorized') { logout('Sessão expirada.'); return; }
+                        alert(err.message);
+                    })
+                    .then(function () { btn.disabled = false; });
+            });
+
             document.getElementById('logout').addEventListener('click', function () { logout(); });
 
             document.querySelectorAll('.chip, .tab').forEach(function (btn) {
                 btn.addEventListener('click', function () {
-                    var group = btn.dataset.range ? 'range' : 'status';
-                    var value = btn.dataset.range || btn.dataset.status;
-                    document.querySelectorAll('[data-' + group + ']').forEach(function (c) {
-                        c.setAttribute('aria-pressed', String(c === btn));
-                    });
-                    if (group === 'range') { range = value; } else { status = value; }
+                    var group = btn.dataset.range ? 'range' : (btn.dataset.vista ? 'vista' : 'status');
+                    var value = btn.dataset.range || btn.dataset.vista || btn.dataset.status;
+                    if (group === 'range') {
+                        document.querySelectorAll('[data-range]').forEach(function (c) {
+                            c.setAttribute('aria-pressed', String(c === btn));
+                        });
+                        range = value;
+                    } else {
+                        // Itens e os filtros de pedido dividem a mesma barra de abas.
+                        document.querySelectorAll('[data-status], [data-vista]').forEach(function (c) {
+                            c.setAttribute('aria-pressed', String(c === btn));
+                        });
+                        if (group === 'vista') { vista = 'itens'; }
+                        else { vista = 'pedidos'; status = value; }
+                        aplicarVista();
+                        loteEl.hidden = vista === 'itens' || status !== 'pending';
+                    }
                     // Troca de aba: o "novo pago" da aba anterior nao deve
                     // disparar bipe de novo ao reaparecer noutra lista.
                     load().catch(function (e) { if (e.message === 'unauthorized') logout('Sessão expirada.'); });

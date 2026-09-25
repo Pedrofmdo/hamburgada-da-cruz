@@ -309,30 +309,6 @@ var menuItemsData = [
         price: "R$ 8,00",
         image: "IMGS/Guarana.jpg",
         category: "acompanhamento"
-    },
-    {
-        id: 9,
-        name: "Cookie Chocochip",
-        description: "Massa tradicional, com gotas de chocolate e finalizado com flor de sal",
-        price: "R$ 14,00",
-        image: "IMGS/Chocochip.jpeg",
-        category: "cookie"
-    },
-    {
-        id: 11,
-        name: "Cookie Nutella",
-        description: "Massa tradicional, gotas de chocolate preto, recheio de nutella e finalizado com flor de sal",
-        price: "R$ 18,00",
-        image: "IMGS/Nutela.jpeg",
-        category: "cookie"
-    },
-    {
-        id: 12,
-        name: "Cookie Limão Siciliano com Frutas Vermelhas",
-        description: "Massa tradicional, gotas de chocolate branco, recheado de brigadeiro de limão siciliano e geleia de frutas vermelhas",
-        price: "R$ 18,00",
-        image: "IMGS/Cookie-Limão-Frutas-vermelhas.jpeg",
-        category: "cookie"
     }
 ];
 

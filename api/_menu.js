@@ -16,9 +16,12 @@ const MENU = {
     6:  { name: 'Coca-Cola Zero',                             priceCents: 800 },
     7:  { name: 'Guaraná',                                    priceCents: 800 },
     8:  { name: 'Guaraná Zero',                                priceCents: 800 },
-    9:  { name: 'Cookie Chocochip',                           priceCents: 1400 },
-    11: { name: 'Cookie Nutella',                             priceCents: 1800 },
-    12: { name: 'Cookie Limão Siciliano com Frutas Vermelhas', priceCents: 1800 }
+    // ESGOTADO (25/09/2026)
+//    9:  { name: 'Cookie Chocochip',                           priceCents: 1400 },
+    // ESGOTADO (25/09/2026)
+//    11: { name: 'Cookie Nutella',                             priceCents: 1800 },
+    // ESGOTADO (25/09/2026)
+//    12: { name: 'Cookie Limão Siciliano com Frutas Vermelhas', priceCents: 1800 }
 };
 
 function getMenuItem(id) {

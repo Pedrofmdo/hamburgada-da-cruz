@@ -2915,7 +2915,8 @@ a {
 
 /* Garante que o atributo [hidden] vença o display:flex das classes abaixo */
 .cart-step[hidden],
-.cart-badge[hidden] {
+.cart-badge[hidden],
+.filter-pill[hidden] {
     display: none;
 }
 

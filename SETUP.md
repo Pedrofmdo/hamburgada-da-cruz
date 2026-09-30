@@ -1,4 +1,4 @@
-# Hamburgada da Cruz — Guia de Configuração (Pedido + Pix)
+# Hamburgada dos Amigos da Cruz — Guia de Configuração (Pedido + Pix)
 
 Este guia cobre o fluxo **carrinho → checkout → Pix estático**, rodando no **free tier do Vercel** com **Vercel Postgres (Neon)**.
 

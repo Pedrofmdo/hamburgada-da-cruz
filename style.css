@@ -2032,13 +2032,15 @@ a {
         gap: 12px;
     }
 
+    /* "Hamburgada dos Amigos da Cruz" nao cabe numa linha so no
+       celular: quebra em duas em vez de cortar no meio da palavra. */
     .logo a {
-        font-size: 1.05rem;
+        font-size: 0.92rem;
         letter-spacing: 0;
-        max-width: calc(100vw - 92px);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        max-width: calc(100vw - 120px);
+        white-space: normal;
+        line-height: 1.15;
+        overflow: visible;
     }
 
     .hero-section {
@@ -2299,7 +2301,8 @@ a {
     }
 
     .logo a {
-        font-size: 0.98rem;
+        font-size: 0.82rem;
+        max-width: calc(100vw - 112px);
     }
 
     .primary-nav {

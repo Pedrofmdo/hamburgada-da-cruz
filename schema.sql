@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════
---  Hamburgada da Cruz — schema do banco (Vercel Postgres / Neon)
+--  Hamburgada dos Amigos da Cruz — schema do banco (Vercel Postgres / Neon)
 --  Rode este arquivo uma vez para criar a tabela de pedidos.
 --  Veja SETUP.md para como executar.
 -- ═══════════════════════════════════════════════════════════

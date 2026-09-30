@@ -200,7 +200,7 @@ server.listen(PORT, function () {
         .filter(function (k) { return !process.env[k]; });
 
     console.log('');
-    console.log('  Hamburgada da Cruz — servidor local');
+    console.log('  Hamburgada dos Amigos da Cruz — servidor local');
     console.log('  ───────────────────────────────────────────');
     console.log('  Site     http://localhost:' + PORT + '/');
     console.log('  Painel   http://localhost:' + PORT + '/admin.html');

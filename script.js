@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   HAMBURGADA DA CRUZ — Cinematic Script
+   HAMBURGADA DOS AMIGOS DA CRUZ — Cinematic Script
    ═══════════════════════════════════════════════════════════ */
 
 // ===== Preloader =====
@@ -319,6 +319,14 @@ var menuItemsData = [
         category: "cookie"
     },
     {
+        id: 10,
+        name: "Cookie Duplochoco",
+        description: "Massa de cacau 100%, com gotas de chocolate branco",
+        price: "R$ 18,00",
+        image: "IMGS/Duplochoco.jpeg",
+        category: "cookie"
+    },
+    {
         id: 11,
         name: "Cookie Nutella",
         description: "Massa tradicional, gotas de chocolate preto, recheio de nutella e finalizado com flor de sal",
@@ -332,6 +340,14 @@ var menuItemsData = [
         description: "Massa tradicional, gotas de chocolate branco, recheado de brigadeiro de limão siciliano e geleia de frutas vermelhas",
         price: "R$ 18,00",
         image: "IMGS/Cookie-Limão-Frutas-vermelhas.jpeg",
+        category: "cookie"
+    },
+    {
+        id: 13,
+        name: "Cookie Red Velvet",
+        description: "Massa red velvet e gotas de chocolate branco, recheado com brigadeiro de cream cheese e geleia de frutas vermelhas",
+        price: "R$ 18,00",
+        image: "IMGS/Redvelvet.jpeg",
         category: "cookie"
     }
 ];
@@ -461,8 +477,11 @@ function showNotification(message, type) {
     if (!el || typeof qrcode === 'undefined') return;
 
     // BR Code estático da chave Pix, sem valor fixo (o doador digita o
-    // valor no próprio app do banco). Gerado uma única vez — não muda.
-    var DONATE_PIX_PAYLOAD = '00020126480014br.gov.bcb.pix0126financeirocmcc@outlook.com5204000053039865802BR5918HAMBURGADA DA CRUZ6011JOAO PESSOA62070503***6304BD9F';
+    // valor no próprio app do banco).
+    // O nome do recebedor vai DENTRO do código, e o final (6304...) é um
+    // dígito verificador do texto inteiro: mudar o nome na mão quebra o QR.
+    // Aqui cabem 25 caracteres, por isso a forma curta do nome.
+    var DONATE_PIX_PAYLOAD = '00020126480014br.gov.bcb.pix0126financeirocmcc@outlook.com5204000053039865802BR5925HAMBURGADA AMIGOS DA CRUZ6011JOAO PESSOA62070503***6304320E';
 
     try {
         var qr = qrcode(0, 'M');
@@ -803,7 +822,7 @@ function showNotification(message, type) {
     // Monta a mensagem do WhatsApp com o resumo do pedido (itens, total e se vai
     // consumir ou retirar no local) — pronta pra enviar junto com o comprovante.
     function buildOrderMessage(cart, customer, totalFormatted) {
-        var lines = ['Olá! Acabei de fazer um pedido na Hamburgada da Cruz e já paguei o Pix. Segue o comprovante:', ''];
+        var lines = ['Olá! Acabei de fazer um pedido na Hamburgada dos Amigos da Cruz e já paguei o Pix. Segue o comprovante:', ''];
 
         lines.push('*Pedido:*');
         (cart || []).forEach(function(l) {

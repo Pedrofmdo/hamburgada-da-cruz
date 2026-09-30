@@ -2,7 +2,7 @@
     "name": "hamburgada-da-cruz",
     "version": "1.0.0",
     "private": true,
-    "description": "Landing page + carrinho, pagamento online (InfinitePay: Pix e cartao) e painel de pedidos da Hamburgada da Cruz.",
+    "description": "Landing page + carrinho, pagamento online (InfinitePay: Pix e cartao) e painel de pedidos da Hamburgada dos Amigos da Cruz.",
     "engines": {
         "node": ">=18"
     },
